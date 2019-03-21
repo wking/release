@@ -1,0 +1,10 @@
+#!/bin/sh
+
+PATTERN="${1}" &&
+BUILD_LOG_CACHE=~/.cache/openshift-deck-build-logs &&
+PATHS="$(find "${BUILD_LOG_CACHE}" -name 'build-log\.txt')" &&
+TOTAL="$(echo "${PATHS}" | wc -l)" &&
+PATHS="$(grep -rc "${PATTERN}" "${BUILD_LOG_CACHE}" | grep -v ':0')" &&
+MATCHES="$(echo "${PATHS}" | wc -l)" &&
+echo "${PATTERN} matches ${MATCHES} of ${TOTAL} failures" &&
+echo "${PATHS}"

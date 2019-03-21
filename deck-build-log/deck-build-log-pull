@@ -1,0 +1,23 @@
+#!/bin/sh
+
+JOB_SUBSTRING='e2e-aws' &&
+BUILD_LOG_CACHE=~/.cache/openshift-deck-build-logs &&
+JOBS="$(curl https://deck-ci.svc.ci.openshift.org/data.js | jq -c ".[] | select(.state == \"failure\" and (.job | contains(\"${JOB_SUBSTRING}\")))")" &&
+echo "${JOBS}" | while read JOB
+do
+	BUILD="$(echo "${JOB}" | jq -r .build_id)" &&
+	JOB_URL="$(echo "${JOB}" | jq -r .url)" &&
+	BUILD_LOG_URL="${JOB_URL/openshift-gce-devel.appspot.com\/build/storage.googleapis.com}/build-log.txt" &&
+	BUILD_LOG_PATH="${BUILD_LOG_CACHE}${BUILD_LOG_URL#*origin-ci-test}" &&
+	JOB_PATH="$(dirname "${BUILD_LOG_PATH}")" &&
+	JSON_PATH="${JOB_PATH}/job.json" &&
+	mkdir -p "${JOB_PATH}" &&
+	if test ! -f "${JSON_PATH}"
+	then
+		echo "${JOB}" | jq . >"${JSON_PATH}"
+	fi &&
+	if test ! -f "${BUILD_LOG_PATH}"
+	then
+		curl "${BUILD_LOG_URL}" >"${BUILD_LOG_PATH}"
+	fi
+done
