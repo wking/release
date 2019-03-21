@@ -36,8 +36,11 @@ for root, _, files in os.walk(cache):
             job = json.load(f)
         with open(os.path.join(root, 'build-log.txt'), 'r') as f:
             build_log = f.read()
+        start = datetime.datetime.fromtimestamp(int(job['started']))
+        #if not start.isoformat().startswith('2019-03-21'):  # example of date filtering
+        #    continue
         entries.append({
-            'started': datetime.datetime.fromtimestamp(int(job['started'])),
+            'started': start,
             'value': value(job=job, build_log=build_log),
             'color': color(job=job, build_log=build_log),
             'url': job['url'],
