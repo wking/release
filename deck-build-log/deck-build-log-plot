@@ -1,0 +1,71 @@
+#!/usr/bin/python2
+
+import datetime
+import json
+import os
+import re
+import sys
+
+import matplotlib.dates
+import matplotlib.pyplot
+
+
+build_log_regexp = re.compile(sys.argv[1])
+
+
+def value(job, build_log):
+    # FIXME: calculate your y-axis value
+    start = datetime.datetime.utcfromtimestamp(int(job['started']))
+    stop = datetime.datetime.strptime(job['finished'], '%Y-%m-%dT%H:%M:%SZ')  # fromisoformat is new in Python 3.7
+    return (stop - start).total_seconds() / 60.
+
+
+def color(job, build_log):
+    # FIXME: calculate your dot color
+    if build_log_regexp.search(build_log) is None:
+        return 'blue'
+    return 'red'
+
+
+cache = os.path.join(os.path.expanduser('~'), '.cache', 'openshift-deck-build-logs')
+entries = []
+for root, _, files in os.walk(cache):
+    if 'job.json' in files and 'build-log.txt' in files:
+        with open(os.path.join(root, 'job.json'), 'rb') as f:
+            job = json.load(f)
+        with open(os.path.join(root, 'build-log.txt'), 'r') as f:
+            build_log = f.read()
+        entries.append({
+            'started': datetime.datetime.fromtimestamp(int(job['started'])),
+            'value': value(job=job, build_log=build_log),
+            'color': color(job=job, build_log=build_log),
+            'url': job['url'],
+        })
+entries.sort(key=lambda entry: entry['started'])
+start = entries[0]['started']
+stop = entries[-1]['started']
+
+figure = matplotlib.pyplot.figure()
+figure.set_size_inches(20, 5)
+axes = figure.add_subplot(1, 1, 1)
+axes.set_title('recent e2e-aws build failures, red for {!r} ({}/{})'.format(  # FIXME: adjust to match value() and color()
+    sys.argv[1], len([e for e in entries if e['color'] == 'red']), len(entries)))
+axes.set_ylabel('job duration (minutes)')  # FIXME: adjust to match value()
+axes.set_xlabel('start time ({} to {} UTC)'.format(start.isoformat(), stop.isoformat()))
+
+scatter = axes.scatter(
+    x=[entry['started'] for entry in entries],
+    y=[entry['value'] for entry in entries],
+    c=[entry['color'] for entry in entries],
+)
+scatter.set_urls([entry['url'] for entry in entries])
+
+locator = matplotlib.dates.HourLocator(interval=4)
+axes.xaxis.set_major_locator(locator)
+axes.xaxis.set_major_formatter(matplotlib.dates.AutoDateFormatter(locator))
+axes.set_xlim(start, stop)
+axes.set_ylim(min(e['value'] for e in entries), max(e['value'] for e in entries))
+figure.tight_layout()
+figure.autofmt_xdate()
+figure.savefig('deck-build-log.svg')
+figure.savefig('deck-build-log.png')

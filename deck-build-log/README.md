@@ -22,7 +22,7 @@ For now, just blow away `~/.cache/openshift-deck-build-logs` each morning (and e
 Then search the logs for a given error message:
 
 ```console
-$ deck-build-log-grep 'timeout while waiting for state to become' | head
+$ deck-build-log-grep 'timeout while waiting for state to become'
 timeout while waiting for state to become matches 206 of 770 failures
 /home/trking/.cache/openshift-deck-build-logs/pr-logs/pull/22363/pull-ci-openshift-origin-master-e2e-aws/5750/build-log.txt:2
 /home/trking/.cache/openshift-deck-build-logs/pr-logs/pull/22363/pull-ci-openshift-origin-master-e2e-aws/5774/build-log.txt:4
@@ -30,4 +30,16 @@ timeout while waiting for state to become matches 206 of 770 failures
 ...
 ```
 
-It would be nice to be able to plot these over time vs. the non-matching failures, but I don't have that worked up yet either.
+To plot matching failures over time, you can use:
+
+```console
+$ deck-build-log-plot 'timeout while waiting for state to become'
+```
+
+which produces both PNG and SVG output like:
+
+![](deck-build-log.png)
+
+Viewing the SVG output in your browser allows you to use the markers as hyperlinks to the job's build page. 
+
+There are `FIXME` markers in `deck-build-log-plot` in case you want to alter it to perform a different analysis.
