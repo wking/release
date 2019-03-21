@@ -23,10 +23,9 @@ Then search the logs for a given error message:
 
 ```console
 $ deck-build-log-grep 'timeout while waiting for state to become'
-timeout while waiting for state to become matches 206 of 770 failures
-/home/trking/.cache/openshift-deck-build-logs/pr-logs/pull/22363/pull-ci-openshift-origin-master-e2e-aws/5750/build-log.txt:2
-/home/trking/.cache/openshift-deck-build-logs/pr-logs/pull/22363/pull-ci-openshift-origin-master-e2e-aws/5774/build-log.txt:4
-/home/trking/.cache/openshift-deck-build-logs/pr-logs/pull/22363/pull-ci-openshift-origin-master-e2e-aws-serial/3390/build-log.txt:4
+timeout while waiting for state to become matches 209 of 816 failures
+.../.cache/openshift-deck-build-logs/pr-logs/pull/22363/pull-ci-openshift-origin-master-e2e-aws/5750/build-log.txt:2
+.../.cache/openshift-deck-build-logs/pr-logs/pull/22363/pull-ci-openshift-origin-master-e2e-aws/5774/build-log.txt:4
 ...
 ```
 

@@ -20,11 +20,12 @@ def value(job, build_log):
     return (stop - start).total_seconds() / 60.
 
 
+match_color = [1, 0, 0, 1]  # red, green, blue, alpha
 def color(job, build_log):
     # FIXME: calculate your dot color
     if build_log_regexp.search(build_log) is None:
-        return 'blue'
-    return 'red'
+        return [0, 0, 1, 0.2]
+    return match_color
 
 
 cache = os.path.join(os.path.expanduser('~'), '.cache', 'openshift-deck-build-logs')
@@ -49,7 +50,7 @@ figure = matplotlib.pyplot.figure()
 figure.set_size_inches(20, 5)
 axes = figure.add_subplot(1, 1, 1)
 axes.set_title('recent e2e-aws build failures, red for {!r} ({}/{})'.format(  # FIXME: adjust to match value() and color()
-    sys.argv[1], len([e for e in entries if e['color'] == 'red']), len(entries)))
+    sys.argv[1], len([e for e in entries if e['color'] == match_color]), len(entries)))
 axes.set_ylabel('job duration (minutes)')  # FIXME: adjust to match value()
 axes.set_xlabel('start time ({} to {} UTC)'.format(start.isoformat(), stop.isoformat()))
 
@@ -57,6 +58,7 @@ scatter = axes.scatter(
     x=[entry['started'] for entry in entries],
     y=[entry['value'] for entry in entries],
     c=[entry['color'] for entry in entries],
+    edgecolor='',
 )
 scatter.set_urls([entry['url'] for entry in entries])
 
