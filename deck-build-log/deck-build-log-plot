@@ -10,6 +10,7 @@ import re
 import urllib2
 
 import matplotlib.dates
+import matplotlib.patches
 import matplotlib.pyplot
 
 
@@ -39,7 +40,7 @@ if args.bug is not None and args.api_key is None:
     raise ValueError('if --bug is set, --api-key must also be set')
 
 
-def value(job, build_log):
+def value(job, build_log=None):
     # FIXME: calculate your y-axis value
     start = datetime.datetime.utcfromtimestamp(int(job['started']))
     stop = datetime.datetime.strptime(job['finished'], '%Y-%m-%dT%H:%M:%SZ')  # fromisoformat is new in Python 3.7
@@ -47,39 +48,95 @@ def value(job, build_log):
 
 
 match_color = [1, 0, 0, 1]  # red, green, blue, alpha
-def color(job, build_log):
-    # FIXME: calculate your dot color
+no_match_color = [0, 0, 1, 0.3]
+success_color = [0, 1, 0, 0.3]
+def color(job, build_log=None):
+    # FIXME: calculate your dot color, or return None to exclude the job
+    if build_log is None:
+        if job['state'] == 'aborted':
+            return None  # I don't care about these yet
+        if job['state'] == 'pending':
+            return None  # no duration for value()
+        if job['state'] == 'failure':
+            return None  # non e2e-aws job, so we didn't pull its build log
+        if job['state'] == 'success':
+            return success_color
+        raise ValueError(job)
     if build_log_regexp.search(build_log) is None:
-        return [0, 0, 1, 0.2]
+        return no_match_color
     return match_color
 
 
 cache = os.path.join(os.path.expanduser('~'), '.cache', 'openshift-deck-build-logs')
 entries = []
+known_urls = set()
 for root, _, files in os.walk(cache):
     if 'job.json' in files and 'build-log.txt' in files:
         with open(os.path.join(root, 'job.json'), 'rb') as f:
             job = json.load(f)
         with open(os.path.join(root, 'build-log.txt'), 'r') as f:
             build_log = f.read()
-        start = datetime.datetime.fromtimestamp(int(job['started']))
-        #if not start.isoformat().startswith('2019-03-21'):  # example of date filtering
-        #    continue
+        known_urls.add(job['url'])
+        job_color = color(job=job, build_log=build_log)
+        if job_color is None:
+            continue
         entries.append({
-            'started': start,
+            'started': datetime.datetime.fromtimestamp(int(job['started'])),
             'value': value(job=job, build_log=build_log),
-            'color': color(job=job, build_log=build_log),
+            'color': job_color,
             'url': job['url'],
         })
+
+with open(os.path.join(cache, 'jobs.json'), 'rb') as f:
+    for job in json.load(f):
+        if job['url'] in known_urls:
+            continue
+        job_color = color(job=job)
+        if job_color is None:
+            continue
+        entries.append({
+            'started': datetime.datetime.fromtimestamp(int(job['started'])),
+            'value': value(job=job),
+            'color': job_color,
+            'url': job['url'],
+        })
+
 entries.sort(key=lambda entry: entry['started'])
+#entries = [  # example of date filtering
+#    entry
+#    for entry in entries
+#    if entry['started'].isoformat().startswith('2019-03-22')
+#]
+
+# FIXME: adjust to match color()
+match_failures = len([e for e in entries if e['color'] == match_color])
+no_match_failures = len([e for e in entries if e['color'] == no_match_color])
+failures = match_failures + no_match_failures
+successes = len([e for e in entries if e['color'] == success_color])
+legend_handles = []
+for legend_color, label in [
+        (match_color, '{!r} failures ({}, {}% of all failures)'.format(
+            args.regexp,
+            match_failures,
+            match_failures * 100 // failures,
+        )),
+        (no_match_color, 'other failures ({})'.format(no_match_failures)),
+        (success_color, 'success ({})'.format(successes)),
+        ]:
+    legend_handles.append(matplotlib.patches.Circle(
+        xy=(0.5, 0.5),  # Matplotlib v1.2, the ancient beast, seems to just draw a patch despite us calling for a Circle, but whatever
+        radius=0.25,
+        color=legend_color[:3],  # slice off the alpha channel
+        label=label,
+    ))
+
 start = entries[0]['started']
 stop = entries[-1]['started']
 
 figure = matplotlib.pyplot.figure()
 figure.set_size_inches(20, 5)
 axes = figure.add_subplot(1, 1, 1)
-axes.set_title('recent e2e-aws build failures, red for {!r} ({}/{})'.format(  # FIXME: adjust to match value() and color()
-    args.regexp, len([e for e in entries if e['color'] == match_color]), len(entries)))
+axes.set_title('recent e2e-aws builds')  # FIXME: adjust to match value() and color()
 axes.set_ylabel('job duration (minutes)')  # FIXME: adjust to match value()
 axes.set_xlabel('start time ({} to {} UTC)'.format(start.isoformat(), stop.isoformat()))
 
@@ -96,6 +153,13 @@ axes.xaxis.set_major_locator(locator)
 axes.xaxis.set_major_formatter(matplotlib.dates.AutoDateFormatter(locator))
 axes.set_xlim(start, stop)
 axes.set_ylim(min(e['value'] for e in entries), max(e['value'] for e in entries))
+axes.legend(
+    legend_handles,
+    # Matplotlib's arg parsing is crazy, and requires us to set to positional args to get the first treated as handles
+    [h.get_label() for h in legend_handles],
+    loc='upper left',
+    frameon=False,
+)
 figure.tight_layout()
 figure.autofmt_xdate()
 figure.savefig('deck-build-log.svg')
@@ -114,14 +178,15 @@ if args.bug is not None:
             stop.strftime('%Y-%m-%dT%H:%M'),
         ),
         'content_type': 'image/svg+xml',
-        'comment': '''This occurred in {matches} of our {total} failures in *-e2e-aws* jobs across the whole CI system over the past {hours} hours.  Generated with [1]:
+        'comment': '''This occurred in {matches} of our {total} failures ({percent}%) in *-e2e-aws* jobs across the whole CI system over the past {hours} hours.  Generated with [1]:
 
   $ deck-build-log-plot {regexp!r}
 
 [1]: https://github.com/wking/openshift-release/tree/debug-scripts/deck-build-log
 '''.format(
-            matches=len([e for e in entries if e['color'] == match_color]),
-            total=len(entries),
+            matches=match_failures,
+            total=failures,
+            percent=match_failures * 100 // failures,
             hours=int((stop - start).total_seconds()) // 3600,
             regexp=args.regexp,
         ),

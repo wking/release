@@ -19,17 +19,17 @@ Subsequent `deck-build-log-pull` calls will fetch the list of recent jobs, but w
 Then search the logs for a given error message:
 
 ```console
-$ deck-build-log-grep 'timeout while waiting for state to become'
-timeout while waiting for state to become matches 209 of 816 failures
-.../.cache/openshift-deck-build-logs/pr-logs/pull/22363/pull-ci-openshift-origin-master-e2e-aws/5750/build-log.txt:2
-.../.cache/openshift-deck-build-logs/pr-logs/pull/22363/pull-ci-openshift-origin-master-e2e-aws/5774/build-log.txt:4
+$ deck-build-log-grep 'Error launching source instance'
+Error launching source instance matches 29 of 625 failures
+.../.cache/openshift-deck-build-logs/pr-logs/pull/operator-framework_operator-lifecycle-manager/777/pull-ci-operator-framework-operator-lifecycle-manager-master-e2e-aws-olm/1364/build-log.txt:2
+.../.cache/openshift-deck-build-logs/pr-logs/pull/operator-framework_operator-lifecycle-manager/777/pull-ci-operator-framework-operator-lifecycle-manager-master-e2e-aws-olm/1365/build-log.txt:2
 ...
 ```
 
 To plot matching failures over time, you can use:
 
 ```console
-$ deck-build-log-plot 'timeout while waiting for state to become'
+$ deck-build-log-plot 'Error launching source instance'
 ```
 
 which produces both PNG and SVG output like:
