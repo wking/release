@@ -29,7 +29,7 @@ Error launching source instance matches 29 of 625 failures
 To plot matching failures over time, you can use:
 
 ```console
-$ deck-build-log-plot 'Error launching source instance'
+$ deck-build-log-plot 'Error launching source instance' 'aws_route_table_association.*timeout while waiting for state' 'aws_route\..*timeout while waiting for state'
 ```
 
 which produces both PNG and SVG output like:

@@ -9,6 +9,7 @@ import os
 import re
 import urllib2
 
+import matplotlib.cm
 import matplotlib.dates
 import matplotlib.patches
 import matplotlib.pyplot
@@ -30,14 +31,18 @@ parser.add_argument(
     help='Red Hat Bugzilla API key ( https://bugzilla.readthedocs.io/en/latest/using/preferences.html#api-keys ).',
 )
 parser.add_argument(
-    'regexp', metavar='REGEXP',
+    'regexps', metavar='REGEXP', nargs='+',
     help='Python regular expression for matching build logs.',
 )
 args = parser.parse_args()
 
-build_log_regexp = re.compile(args.regexp)
-if args.bug is not None and args.api_key is None:
-    raise ValueError('if --bug is set, --api-key must also be set')
+regexps = [re.compile(regexp) for regexp in args.regexps]
+if args.bug is not None:
+    if args.api_key is None:
+        raise ValueError('if --bug is set, --api-key must also be set')
+
+    if len(regexps) != 1:
+        raise ValueError('bug submission requires a single REGEXP')
 
 
 def value(job, build_log=None):
@@ -47,7 +52,7 @@ def value(job, build_log=None):
     return (stop - start).total_seconds() / 60.
 
 
-match_color = [1, 0, 0, 1]  # red, green, blue, alpha
+color_map = matplotlib.cm.get_cmap('autumn', 2*len(args.regexps))  # 2* so we stay in the dark end
 no_match_color = [0, 0, 1, 0.3]
 success_color = [0, 1, 0, 0.3]
 def color(job, build_log=None):
@@ -62,9 +67,12 @@ def color(job, build_log=None):
         if job['state'] == 'success':
             return success_color
         raise ValueError(job)
-    if build_log_regexp.search(build_log) is None:
-        return no_match_color
-    return match_color
+    for i, regexp in enumerate(regexps):
+        match = regexp.search(build_log)
+        if match:
+            #print(match.group(0))
+            return color_map(float(i) / len(regexps))
+    return no_match_color
 
 
 cache = os.path.join(os.path.expanduser('~'), '.cache', 'openshift-deck-build-logs')
@@ -109,20 +117,30 @@ entries.sort(key=lambda entry: entry['started'])
 #]
 
 # FIXME: adjust to match color()
-match_failures = len([e for e in entries if e['color'] == match_color])
 no_match_failures = len([e for e in entries if e['color'] == no_match_color])
-failures = match_failures + no_match_failures
 successes = len([e for e in entries if e['color'] == success_color])
+failures = len(entries) - successes
+match_failures = []
+legend_entries = []
+for i, regexp in enumerate(regexps):
+    match_color = color_map(float(i) / len(regexps))
+    count = len([e for e in entries if e['color'] == match_color])
+    match_failures.append(count)
+    legend_entries.append((
+        match_color,
+        '{!r} failures ({}, {}% of all failures)'.format(
+            regexp.pattern,
+            count,
+            count * 100 // failures,
+        ),
+    ))
+legend_entries.extend([
+    (no_match_color, 'other failures ({})'.format(no_match_failures)),
+    (success_color, 'success ({})'.format(successes)),
+])
+
 legend_handles = []
-for legend_color, label in [
-        (match_color, '{!r} failures ({}, {}% of all failures)'.format(
-            args.regexp,
-            match_failures,
-            match_failures * 100 // failures,
-        )),
-        (no_match_color, 'other failures ({})'.format(no_match_failures)),
-        (success_color, 'success ({})'.format(successes)),
-        ]:
+for legend_color, label in legend_entries:
     legend_handles.append(matplotlib.patches.Circle(
         xy=(0.5, 0.5),  # Matplotlib v1.2, the ancient beast, seems to just draw a patch despite us calling for a Circle, but whatever
         radius=0.25,
@@ -186,9 +204,9 @@ if args.bug is not None:
 '''.format(
             matches=match_failures,
             total=failures,
-            percent=match_failures * 100 // failures,
+            percent=match_failures[0] * 100 // failures,
             hours=int((stop - start).total_seconds()) // 3600,
-            regexp=args.regexp,
+            regexp=regexps[0].pattern,
         ),
     }
     try:
