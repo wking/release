@@ -1,6 +1,6 @@
 Scripts for pulling and grepping Deck builds logs.
 This makes it easier to estimate the impact of a given error in OpenShift CI.
-First, populate your local cache of build logs from recent failing `*-e2e-aws*` jobs:
+First, populate your local cache of build logs (`~/.cache/openshift-deck-build-logs`) from recent failing `*-e2e-aws*` jobs:
 
 ```console
 $ deck-build-log-pull
@@ -13,11 +13,8 @@ $ deck-build-log-pull
 ...
 ```
 
-This seems to pull 48 hours of failures by default, so the first run will take a while.
-Subsequent `deck-build-log-pull` calls will fetch the list of recent jobs, but will then only download build logs from new failures, so they'll be faster if you're polling throughout the day.
-
-I still need to set something up to expire stale cache entries.
-For now, just blow away `~/.cache/openshift-deck-build-logs` each morning (and eat the cost of re-pulling the overlapping 24 hours).
+This seems to pull 48 hours of failures, so the first run will take a while.
+Subsequent `deck-build-log-pull` calls will fetch the list of recent jobs, but will then only download build logs from new failures (and prune older failures), so they'll be faster if you're polling throughout the day.
 
 Then search the logs for a given error message:
 
