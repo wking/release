@@ -81,7 +81,7 @@ for root, _, files in os.walk(cache):
         if job_color is None:
             continue
         entries.append({
-            'started': datetime.datetime.fromtimestamp(int(job['started'])),
+            'started': datetime.datetime.utcfromtimestamp(int(job['started'])),
             'value': value(job=job, build_log=build_log),
             'color': job_color,
             'url': job['url'],
@@ -95,7 +95,7 @@ with open(os.path.join(cache, 'jobs.json'), 'rb') as f:
         if job_color is None:
             continue
         entries.append({
-            'started': datetime.datetime.fromtimestamp(int(job['started'])),
+            'started': datetime.datetime.utcfromtimestamp(int(job['started'])),
             'value': value(job=job),
             'color': job_color,
             'url': job['url'],
