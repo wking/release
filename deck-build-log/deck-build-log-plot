@@ -1,16 +1,42 @@
 #!/usr/bin/python2
 
+import argparse
+import base64
 import datetime
+import io
 import json
 import os
 import re
-import sys
+import urllib2
 
 import matplotlib.dates
 import matplotlib.pyplot
 
 
-build_log_regexp = re.compile(sys.argv[1])
+# https://bugzilla.readthedocs.io/en/latest/api/core/v1/attachment.html#create-attachment
+bugzilla_template = 'https://bugzilla.redhat.com/rest/bug/{}/attachment'
+
+
+parser = argparse.ArgumentParser(
+    description='Plot matching build failures over time.',
+)
+parser.add_argument(
+    '-b', '--bug', dest='bug', type=int,
+    help='Red Hat Bugzilla bug number for uploading an attachment.',
+)
+parser.add_argument(
+    '-k', '--api-key', dest='api_key',
+    help='Red Hat Bugzilla API key ( https://bugzilla.readthedocs.io/en/latest/using/preferences.html#api-keys ).',
+)
+parser.add_argument(
+    'regexp', metavar='REGEXP',
+    help='Python regular expression for matching build logs.',
+)
+args = parser.parse_args()
+
+build_log_regexp = re.compile(args.regexp)
+if args.bug is not None and args.api_key is None:
+    raise ValueError('if --bug is set, --api-key must also be set')
 
 
 def value(job, build_log):
@@ -53,7 +79,7 @@ figure = matplotlib.pyplot.figure()
 figure.set_size_inches(20, 5)
 axes = figure.add_subplot(1, 1, 1)
 axes.set_title('recent e2e-aws build failures, red for {!r} ({}/{})'.format(  # FIXME: adjust to match value() and color()
-    sys.argv[1], len([e for e in entries if e['color'] == match_color]), len(entries)))
+    args.regexp, len([e for e in entries if e['color'] == match_color]), len(entries)))
 axes.set_ylabel('job duration (minutes)')  # FIXME: adjust to match value()
 axes.set_xlabel('start time ({} to {} UTC)'.format(start.isoformat(), stop.isoformat()))
 
@@ -74,3 +100,44 @@ figure.tight_layout()
 figure.autofmt_xdate()
 figure.savefig('deck-build-log.svg')
 figure.savefig('deck-build-log.png')
+
+if args.bug is not None:
+    url = bugzilla_template.format(args.bug) + '?api_key={}'.format(args.api_key)
+    buf = io.BytesIO()
+    figure.savefig(buf, format='svg')
+    data = {
+        'ids': [args.bug],
+        'data': base64.b64encode(buf.getvalue()),
+        'file_name': 'deck-build-log.svg',
+        'summary': 'Occurrences of this error in CI from {} to {} UTC'.format(
+            start.strftime('%Y-%m-%dT%H:%M'),
+            stop.strftime('%Y-%m-%dT%H:%M'),
+        ),
+        'content_type': 'image/svg+xml',
+        'comment': '''This occurred in {matches} of our {total} failures in *-e2e-aws* jobs across the whole CI system over the past {hours} hours.  Generated with [1]:
+
+  $ deck-build-log-plot {regexp!r}
+
+[1]: https://github.com/wking/openshift-release/tree/debug-scripts/deck-build-log
+'''.format(
+            matches=len([e for e in entries if e['color'] == match_color]),
+            total=len(entries),
+            hours=int((stop - start).total_seconds()) // 3600,
+            regexp=args.regexp,
+        ),
+    }
+    try:
+        response = urllib2.urlopen(urllib2.Request(
+            url=url,
+            data=json.dumps(data),
+            headers={
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-BUGZILLA-API-KEY': args.api_key,  # but not supported yet by our Bugzilla 5.0.4.rh14, hence the query param above
+            },
+        ))
+    except urllib2.HTTPError as error:
+        response = error
+    print('POSTed attachment to bug {} returned {}'.format(args.bug, response.getcode()))
+    print(response.read())
+    response.close()
