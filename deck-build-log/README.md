@@ -1,6 +1,6 @@
 Scripts for pulling and grepping Deck builds logs.
 This makes it easier to estimate the impact of a given error in OpenShift CI.
-First, populate your local cache of build logs from recent failing `*-e2e-aws` jobs:
+First, populate your local cache of build logs from recent failing `*-e2e-aws*` jobs:
 
 ```console
 $ deck-build-log-pull
