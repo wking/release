@@ -31,6 +31,9 @@ sync() {
 	done
 }
 
+if [ ! -d "${BUILD_LOG_CACHE}" ]; then
+  mkdir -p ${BUILD_LOG_CACHE}
+fi
 curl https://deck-ci.svc.ci.openshift.org/data.js | jq "[.[] | select (.job | contains(\"${JOB_SUBSTRING}\"))]" >"${BUILD_LOG_CACHE}/jobs.json" &&
 JOBS="$(jq -c ".[] | select(.state == \"failure\")" "${BUILD_LOG_CACHE}/jobs.json")" &&
 OLDEST_TIMESTAMP="$(echo "${JOBS}" | sync | tail -n1)" &&
