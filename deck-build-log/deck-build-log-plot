@@ -128,15 +128,27 @@ for i, regexp in enumerate(regexps):
     match_failures.append(count)
     legend_entries.append((
         match_color,
-        '{!r} failures ({}, {}% of all failures)'.format(
-            regexp.pattern,
+        '{} ({}% of all failures) {!r}'.format(
             count,
             count * 100 // failures,
+            regexp.pattern,
         ),
     ))
 legend_entries.extend([
-    (no_match_color, 'other failures ({})'.format(no_match_failures)),
-    (success_color, 'success ({})'.format(successes)),
+    (
+        no_match_color,
+        '{} ({}% of all failures) other failures'.format(
+            no_match_failures,
+            no_match_failures * 100 // failures,
+        ),
+    ),
+    (
+        success_color,
+        '{} ({}% of jobs) success'.format(
+            successes,
+            successes * 100 // (failures + successes),
+        ),
+    ),
 ])
 
 legend_handles = []
