@@ -45,10 +45,17 @@ if args.bug is not None:
         raise ValueError('bug submission requires a single REGEXP')
 
 
+def start_stop(job):
+    start = datetime.datetime.utcfromtimestamp(int(job['started']))
+    stop = None
+    if job.get('finished', ''):
+        stop = datetime.datetime.strptime(job['finished'], '%Y-%m-%dT%H:%M:%SZ')  # fromisoformat is new in Python 3.7
+    return (start, stop)
+
+
 def value(job, build_log=None):
     # FIXME: calculate your y-axis value
-    start = datetime.datetime.utcfromtimestamp(int(job['started']))
-    stop = datetime.datetime.strptime(job['finished'], '%Y-%m-%dT%H:%M:%SZ')  # fromisoformat is new in Python 3.7
+    start, stop = start_stop(job=job)
     return (stop - start).total_seconds() / 60.
 
 
@@ -88,22 +95,29 @@ for root, _, files in os.walk(cache):
         job_color = color(job=job, build_log=build_log)
         if job_color is None:
             continue
+        start, stop = start_stop(job=job)
         entries.append({
-            'started': datetime.datetime.utcfromtimestamp(int(job['started'])),
+            'started': start,
             'value': value(job=job, build_log=build_log),
             'color': job_color,
             'url': job['url'],
         })
 
+now = None
 with open(os.path.join(cache, 'jobs.json'), 'rb') as f:
     for job in json.load(f):
+        start, stop = start_stop(job=job)
+        if now is None or start > now:
+            now = start
+        if stop is not None and stop > now:
+            now = stop
         if job['url'] in known_urls:
             continue
         job_color = color(job=job)
         if job_color is None:
             continue
         entries.append({
-            'started': datetime.datetime.utcfromtimestamp(int(job['started'])),
+            'started': start,
             'value': value(job=job),
             'color': job_color,
             'url': job['url'],
@@ -170,6 +184,16 @@ axes.set_title('recent e2e-aws builds')  # FIXME: adjust to match value() and co
 axes.set_ylabel('job duration (minutes)')  # FIXME: adjust to match value()
 axes.set_xlabel('start time ({} to {} UTC)'.format(start.isoformat(), stop.isoformat()))
 
+max_value = max(entry['value'] for entry in entries)
+# most recent possible job results
+axes.plot(
+    [now - datetime.timedelta(minutes=max_value), now],  # FIXME: adjust to match value()
+    [max_value, 0],
+    color='black',
+    alpha=0.25,
+    linestyle='-',
+)
+
 scatter = axes.scatter(
     x=[entry['started'] for entry in entries],
     y=[entry['value'] for entry in entries],
@@ -182,7 +206,7 @@ locator = matplotlib.dates.HourLocator(interval=4)
 axes.xaxis.set_major_locator(locator)
 axes.xaxis.set_major_formatter(matplotlib.dates.AutoDateFormatter(locator))
 axes.set_xlim(start, stop)
-axes.set_ylim(min(e['value'] for e in entries), max(e['value'] for e in entries))
+axes.set_ylim(min(e['value'] for e in entries), max_value)
 axes.legend(
     legend_handles,
     # Matplotlib's arg parsing is crazy, and requires us to set to positional args to get the first treated as handles
