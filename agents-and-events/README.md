@@ -13,3 +13,5 @@ $ curl -s https://s3.amazonaws.com/aws-athena-query-results-460538899914-us-east
 721717 destroyer:
 ...
 ```
+
+The Lambda function feeding `agents-and-events.csv` is based on [`report-agents-and-events.py`](report-agents-and-events.py).
