@@ -113,5 +113,10 @@ figure.tight_layout()
 figure.autofmt_xdate()
 figure.savefig('vpc.png')
 
+for count, eventname in [
+        (creates, 'CreateVpc'),
+        (deletes, 'DeleteVpc'),
+        ]:
+    print('{}\t{}'.format(count, eventname))
 for count, error_code in sorted([(count, error_code) for error_code, count in error_codes.items()]):
     print('{}\t{}'.format(count, error_code))

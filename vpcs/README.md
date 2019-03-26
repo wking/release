@@ -20,6 +20,8 @@ with:
 
 ```console
 $ vpc.py <vpc.csv
+1242  CreateVpc
+1205  DeleteVpc
 7     Client.VpcLimitExceeded
 1112  Client.DependencyViolation
 1791  Client.RequestLimitExceeded
