@@ -65,6 +65,8 @@ success_color = [0, 1, 0, 0.3]
 def color(job, build_log=None):
     # FIXME: calculate your dot color, or return None to exclude the job
     if build_log is None:
+        if job['state'] == 'triggered':
+            return None  # I don't care about these yet
         if job['state'] == 'aborted':
             return None  # I don't care about these yet
         if job['state'] == 'pending':
