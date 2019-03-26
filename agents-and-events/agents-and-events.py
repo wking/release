@@ -17,7 +17,7 @@ humans = set([
 
 boring_users = set([
     '',
-    'origin-ci-robot-provision',
+#    'origin-ci-robot-provision',
 ])
 
 username_regexp = re.compile('^(?:ci-(?:op|ln)|[a-z0-9]*)-[a-z0-9]*-[a-z0-9]*-([a-z-]*)-[a-z0-9]*$')
