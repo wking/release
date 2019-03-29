@@ -63,7 +63,7 @@ figure = matplotlib.pyplot.figure()
 figure.set_size_inches(20, 10)
 
 axes = figure.add_subplot(2, 1, 1)
-n, bins, _ = axes.hist(data, bins, histtype='barstacked', rwidth=1, edgecolor='none', label=names)
+_, bins, _ = axes.hist(data, bins, histtype='barstacked', rwidth=1, edgecolor='none', label=names)
 axes.set_title('Calls')
 axes.set_xlabel('{} through {} UTC'.format(begin.isoformat(' '), end.isoformat(' ')))
 axes.set_ylabel('stacked count (per {}-minute bin)'.format(bin_minutes))
@@ -72,17 +72,26 @@ axes.xaxis.set_major_locator(locator)
 axes.xaxis.set_major_formatter(matplotlib.dates.AutoDateFormatter(locator))
 axes.axis('tight')
 
-vpc_index = names.index('CreateVpc')
-if vpc_index < 0:
-    raise ValueError(names)
-vpc_counts = n[vpc_index]
+def num2date(num):  # not in my ancient Matplotlib v1.2.0's matplotlib.dates
+    return begin + datetime.timedelta(days=num - bins[0])
+
+bin_centers = [(a + b) / 2 for a, b in zip(bins, bins[1:])]
+counts = collections.defaultdict(list)
+for name in names:
+    for i in range(len(bin_centers)):
+        b = num2date(bins[i])
+        e = num2date(bins[i+1])
+        counts[name].append(len([t for t in requests[name] if t >= b and t <= e]))
+vpc_counts = float(len(requests['CreateVpc']))
+
 xs = []
 ys = []
-for counts, name in zip(n, names):
+for name in names:
+    print('{}\t{:.2f}\t{}'.format(len(requests[name]), len(requests[name]) / vpc_counts, name))
     if name == 'CreateVpc':
         continue
-    xs.append([(a + b) / 2 for a, b in zip(bins, bins[1:])])
-    ys.append([count / (float(vpc_count) or 1) for count, vpc_count in zip(counts, vpc_counts)])
+    xs.append(bin_centers)
+    ys.append([count / float(vpc_count) for count, vpc_count in zip(counts[name], counts['CreateVpc'])])
 
 axes = figure.add_subplot(2, 1, 2)
 for x, y, name in zip(xs, ys, names):
@@ -96,7 +105,3 @@ axes.axis('tight')
 axes.set_xlim(bins[0], bins[-1])
 
 figure.savefig('calls-per-vpc.png')
-
-vpc_count = float(sum(vpc_counts))
-for counts, name in zip(n, names):
-    print('{}\t{:.2f}\t{}'.format(sum(counts), sum(counts) / vpc_count, name))

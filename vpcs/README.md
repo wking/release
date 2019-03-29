@@ -53,9 +53,9 @@ eventname IN ('CreateVpc', 'CreateNatGateway')
 
 ```console
 $ calls-per-vpc.py <vpc-and-nat.csv
-13685  9.01   CreateNatGateway (error)
-9886   6.51   CreateVpc (error)
-8664   5.70   CreateNatGateway
+3799   2.50   CreateNatGateway (error)
+1222   0.80   CreateVpc (error)
+7145   4.70   CreateNatGateway
 1519   1.00   CreateVpc
 ```
 
