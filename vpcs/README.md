@@ -30,3 +30,14 @@ $ vpc.py <vpc.csv
 to generate plots like:
 
 ![](vpc.png)
+
+You can also scrape Prow/Deck's data to plot concurrent clusters over time (for the past ~48 hours or so, depending on how much data Deck is holding).
+Run:
+
+```console
+$ concurrent.py
+```
+
+to generate plots like:
+
+![](concurrent.png)
