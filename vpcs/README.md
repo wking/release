@@ -41,3 +41,24 @@ $ concurrent.py
 to generate plots like:
 
 ![](concurrent.png)
+
+You can also feed similar data into `calls-per-vpc.py` to see how often a call is being made per `CreateVpc` call.
+After adjusting the above Athena query to use:
+
+```sql
+eventname IN ('CreateVpc', 'CreateNatGateway')
+```
+
+(or whatever calls you are interested in, as long as you include `CreateVpc`), run:
+
+```console
+$ calls-per-vpc.py <vpc-and-nat.csv
+13685  9.01   CreateNatGateway (error)
+9886   6.51   CreateVpc (error)
+8664   5.70   CreateNatGateway
+1519   1.00   CreateVpc
+```
+
+to generate plots like:
+
+![](calls-per-vpc.png)
