@@ -53,6 +53,10 @@ for row in reader:
         operator = 'installer'
     elif 'OpenShift/4.x Destroyer' in row['useragent']:
         operator = 'destroyer'
+    elif 'openshift-image-registry' in username:
+        operator = 'openshift-image-registry'
+    elif 'openshift-ingress' in username:
+        operator = 'openshift-ingress'
     elif 'Terraform/' in row['useragent']:
         operator = 'terraform'
     elif username in boring_users:
