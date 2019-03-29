@@ -10,14 +10,27 @@ import boto3
 logger = logging.getLogger()
 logger.setLevel(logging.WARNING)
 
+query = '''
+SELECT useragent,
+       useridentity.username,
+       eventsource,
+       eventname,
+       errorcode,
+       count(*) as "count"
+FROM "default"."cloudtrail_logs_cloud_trail_test_clayton"
+WHERE from_iso8601_timestamp(eventtime) > date_add('hour', -24, now())
+GROUP BY useragent,
+         useridentity.username,
+         eventsource,
+         eventname,
+         errorcode
+ORDER BY "count" desc;
+'''.strip()
 
-def run_query(region, query_id, bucket):
-    logger.info('run {} in {}'.format(query_id, region))
+
+def run_query(region, bucket):
+    logger.info('run in {}'.format(region))
     athena = boto3.client('athena', region_name=region)
-
-    response = athena.get_named_query(NamedQueryId=query_id)
-    query = response['NamedQuery']['QueryString']
-    logger.info('got query:\n{}'.format(query))
 
     response = athena.start_query_execution(
         QueryString=query,
@@ -64,11 +77,10 @@ def publish_results(region, bucket, output_hash):
 
 def lambda_handler(*args, **kwargs):
     region = 'us-east-1'
-    query_id = '6fdc7728-406a-4568-93d7-c5d08104120a'
     bucket = 'aws-athena-query-results-460538899914-us-east-1'
 
     try:
-        output_hash = run_query(region=region, query_id=query_id, bucket=bucket)
+        output_hash = run_query(region=region, bucket=bucket)
         publish_results(region=region, bucket=bucket, output_hash=output_hash)
     except Exception as error:
         logger.error(error)

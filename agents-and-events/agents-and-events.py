@@ -77,7 +77,10 @@ for row in reader:
         service = match.group(1)
     else:
         raise ValueError('unrecognized event source: {!r}'.format(row['eventsource']))
-    operator_actions[operator]['{}.{}'.format(service, row['eventname'])] += int(row['count'])
+    event = '{}.{}'.format(service, row['eventname'])
+    if row.get('errorcode', ''):
+        event += ' ({})'.format(row['errorcode'])
+    operator_actions[operator][event] += int(row['count'])
 
 for operator, actions in operator_actions.items():
     actions['total'] = sum(actions.values())
