@@ -36,7 +36,10 @@ for job in jobs:
 clusters.sort(key=lambda start_stop: start_stop[0])
 
 start = min(start for start, _ in clusters)
+last_start = max(start for start, _ in clusters)
 stop = max(stop for _, stop in clusters if stop is not None)
+if last_start > stop:
+    stop = last_start
 
 times = []
 concurrent = []
