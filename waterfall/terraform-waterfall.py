@@ -7,7 +7,7 @@ import re
 import sys
 
 
-log_regexp = re.compile('^time="([0-9T:-]*)Z" level=([a-z]*) msg="([^"]*)".*$')
+log_regexp = re.compile('^time="([0-9T:-]*)[Z+-](?:[0-9:]*)?" level=([a-z]*) msg="([^"]*)".*$')
 creating_regexp = re.compile('^([^:]*): Creating\.\.\.$')
 created_regexp = re.compile('^([^:]*): Creation complete after .*$')
 
@@ -32,6 +32,9 @@ for line in sys.stdin.readlines():
         continue
 
     resources[match.group(1)].append(timestamp)
+
+if not resources:
+    raise ValueError('no resources completed?')
 
 rectangles = []
 y = 0
