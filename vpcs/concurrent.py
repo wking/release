@@ -54,7 +54,7 @@ figure.set_size_inches(20, 5)
 
 axes = figure.add_subplot(1, 1, 1)
 axes.plot(times, concurrent, '.')
-axes.set_title('Concurrent clusters')
+axes.set_title('Concurrent clusters ({} total)'.format(len(clusters)))
 axes.set_ylabel('count')
 axes.set_xlabel('{} through {} UTC'.format(start.isoformat(' '), stop.isoformat(' ')))
 locator = matplotlib.dates.AutoDateLocator()
