@@ -240,7 +240,7 @@ if args.bug is not None:
 
 [1]: https://github.com/wking/openshift-release/tree/debug-scripts/deck-build-log
 '''.format(
-            matches=match_failures,
+            matches=match_failures[0],
             total=failures,
             percent=match_failures[0] * 100 // failures,
             hours=int((stop - start).total_seconds()) // 3600,
