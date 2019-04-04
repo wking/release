@@ -30,14 +30,20 @@ for root, _, files in os.walk(cache):
             job = json.load(f)
         if args.job not in job['job']:
             continue
+        with open(os.path.join(root, 'build-log.txt'), 'r') as f:
+            build_log = f.read()
+        test_failure = False
+        for line in build_log.splitlines():
+            if line == 'Failing tests:':
+                test_failure = True
+        if not test_failure:
+            continue
         start = datetime.datetime.utcfromtimestamp(int(job['started']))
         if first is None:
             first = start
         if last is None or last < start:
             last = start
         total += 1
-        with open(os.path.join(root, 'build-log.txt'), 'r') as f:
-            build_log = f.read()
         for line in build_log.splitlines():
             match = failure_regexp.match(line)
             if match:
