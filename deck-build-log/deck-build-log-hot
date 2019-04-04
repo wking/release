@@ -20,7 +20,6 @@ args = parser.parse_args()
 
 cache = os.path.join(os.path.expanduser('~'), '.cache', 'openshift-deck-build-logs')
 entries = collections.defaultdict(lambda: 0)
-known_urls = set()
 failure_regexp = re.compile('^failed: \([^)]*\) [0-9T:-]* "([^"]*)"$')
 total = 0
 first = last = None
