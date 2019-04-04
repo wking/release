@@ -44,9 +44,19 @@ To get a quick estimate of failure rates over the whole set of cached logs, use:
 
 ```console
 $ deck-build-log-hot | head -n4
-$ ./deck-build-log-hot | head -n4
 Failed  % of 112        Test (started between 2019-04-03T08:27:36 and 2019-04-04T02:32:49 UTC)
 41      36      [Disruptive] Cluster upgrade should maintain a functioning cluster [Feature:ClusterUpgrade] [Suite:openshift] [Serial]
 31      27      [Feature:Platform] Managed cluster should have no crashlooping pods in core namespaces over two minutes [Suite:openshift/conformance/parallel]
 9       8       [sig-scheduling] ResourceQuota should create a ResourceQuota and capture the life of a secret. [Suite:openshift/conformance/parallel] [Suite:k8s]
+```
+
+And to get pass rates for various important job categories, use:
+
+```console
+$ deck-metrics
+Test started between 2019-04-04T05:55:29 and 2019-04-04T05:55:29 UTC
+116/267 43      .*-master-e2e-aws$
+364/437 83      .*-images$
+57/118  48      .*release-.*-origin-.*-e2e-aws.*
+6/6     100     .*release-.*-ocp-.*-e2e-aws.*
 ```

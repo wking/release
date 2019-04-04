@@ -1,0 +1,54 @@
+#!/usr/bin/python3
+
+import argparse
+import codecs
+import collections
+import datetime
+import json
+import os
+import re
+import urllib.request
+
+
+parser = argparse.ArgumentParser(
+    description='Pass rates for various job classes.',
+)
+# TODO: add configurable time window
+parser.parse_args()
+
+
+job_regexps = [
+    re.compile('.*-master-e2e-aws$'),
+    re.compile('.*-images$'),
+    re.compile('.*release-.*-origin-.*-e2e-aws.*'), 
+    re.compile('.*release-.*-ocp-.*-e2e-aws.*'),
+]
+
+uri = 'https://prow.svc.ci.openshift.org/data.js'
+with urllib.request.urlopen(uri) as f:
+     string_f = codecs.getreader('utf-8')(f)  # support for Python < 3.6
+     jobs = json.load(string_f)
+groups = collections.defaultdict(lambda: collections.defaultdict(lambda: 0))
+first = last = None
+for job in jobs:
+    start = datetime.datetime.utcfromtimestamp(int(job['started']))
+    if first is None:
+        first = start
+    if last is None or last < start:
+        last = start
+    for job_regexp in job_regexps:
+        if job_regexp.match(job['job']):
+            groups[job_regexp.pattern][job['state']] += 1
+
+print('Test started between {} and {} UTC'.format(
+    first.isoformat(), last.isoformat()))
+for job_regexp in job_regexps:
+    group = groups[job_regexp.pattern]
+    if group['success'] == 0 and group['failure'] == 0:
+        print('\tneither\t{}', job_regexp.pattern)
+        continue
+    print('{}/{}\t{}\t{}'.format(
+        group['success'],
+        group['success'] + group['failure'],
+        group['success'] * 100 // (group['success'] + group['failure']),
+        job_regexp.pattern))
