@@ -39,3 +39,13 @@ which produces both PNG and SVG output like:
 Viewing the SVG output in your browser allows you to use the markers as hyperlinks to the job's build page. 
 
 There are `FIXME` markers in `deck-build-log-plot` in case you want to alter it to perform a different analysis.
+
+To get a quick estimate of failure rates over the whole set of cached logs, use:
+
+```console
+$ deck-build-log-hot | head -n4
+Failed  % of 362        Test (started between 2019-04-03T13:23:12 and 2019-04-04T04:11:29 UTC)
+41      11      [Disruptive] Cluster upgrade should maintain a functioning cluster [Feature:ClusterUpgrade] [Suite:openshift] [Serial]
+31      8       [Feature:Platform] Managed cluster should have no crashlooping pods in core namespaces over two minutes [Suite:openshift/conformance/parallel]
+9       2       [sig-scheduling] ResourceQuota should create a ResourceQuota and capture the life of a secret. [Suite:openshift/conformance/parallel] [Suite:k8s]
+```

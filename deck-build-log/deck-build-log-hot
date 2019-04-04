@@ -1,0 +1,49 @@
+#!/usr/bin/python3
+
+import argparse
+import collections
+import datetime
+import json
+import os
+import re
+
+
+parser = argparse.ArgumentParser(
+    description='Count per-test failure frequency.',
+)
+parser.add_argument(
+    'job', metavar='JOB', nargs='?', default='',
+    help='Job name substring (e.g. -e2e-aws or -e2e-aws-upgrade).',
+)
+args = parser.parse_args()
+
+
+cache = os.path.join(os.path.expanduser('~'), '.cache', 'openshift-deck-build-logs')
+entries = collections.defaultdict(lambda: 0)
+known_urls = set()
+failure_regexp = re.compile('^failed: \([^)]*\) [0-9T:-]* "([^"]*)"$')
+total = 0
+first = last = None
+for root, _, files in os.walk(cache):
+    if 'job.json' in files and 'build-log.txt' in files:
+        with open(os.path.join(root, 'job.json'), 'r') as f:
+            job = json.load(f)
+        if args.job not in job['job']:
+            continue
+        start = datetime.datetime.utcfromtimestamp(int(job['started']))
+        if first is None:
+            first = start
+        if last is None or last < start:
+            last = start
+        total += 1
+        with open(os.path.join(root, 'build-log.txt'), 'r') as f:
+            build_log = f.read()
+        for line in build_log.splitlines():
+            match = failure_regexp.match(line)
+            if match:
+                entries[match.group(1)] += 1
+
+print('Failed\t% of {}\tTest (started between {} and {} UTC)'.format(
+    total, first.isoformat(), last.isoformat()))
+for failures, test in sorted([(failures, test) for test, failures in entries.items()], reverse=True):
+    print('{}\t{}\t{}'.format(failures, failures * 100 // total, test))
