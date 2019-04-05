@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>OpenShift Bugzilla</title>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <p>
+      <a href="https://en.wikipedia.org/wiki/Bookmarklet">Bookmarklet</a> for searching <a href="javascript:(function() {
+function se(d) {
+  return d.selection ? d.selection.createRange().text : d.getSelection()
+}
+s = se(document);
+for (i=0; i<frames.length && !s; i++) s = se(frames[i].document);
+if (!s || s=='') s = prompt('Enter%20search%20string%20for%20OpenShift%20Bugzilla','');
+open('https://bugzilla.redhat.com' + (s ? '/buglist.cgi?query_format=advanced&product=OpenShift%20Container%20Platform&longdesc_type=casesubstring&longdesc=' + encodeURIComponent(s) : '')).focus();
+})();">OpenShift Bugzilla</a>.
+      Bookmark the link, and then click the bookmark to search OpenStack's Bugzilla for exact matches for the selected string.
+      This is useful for looking up error messages and the like.
+      If no text is selected, the bookmarklet will prompt you for a string.
+    </p>
+  </body>
+</html>
