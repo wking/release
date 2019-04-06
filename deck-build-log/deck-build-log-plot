@@ -62,6 +62,19 @@ def start_stop(job):
     return (start, stop)
 
 
+def pull_uri(job):
+    refs = job.get('refs', {})
+    pull = refs.get('pulls', [{}])[0]
+    link = pull.get('link', None)
+    if link:
+        return link
+    number = pull.get('number', None)
+    if number:
+        return 'https://github.com/{}/{}/pull/{}'.format(
+            refs['org'], refs['repo'], number)
+    return job['url']
+
+
 def value(job, build_log=None):
     # FIXME: calculate your y-axis value
     start, stop = start_stop(job=job)
@@ -71,7 +84,7 @@ def value(job, build_log=None):
 color_map = matplotlib.cm.get_cmap('autumn', 2*len(args.regexps))  # 2* so we stay in the dark end
 no_match_color = [0, 0, 1, 0.3]
 success_color = [0, 1, 0, 0.3]
-def color(job, build_log=None):
+def color(job, build_log=None, links=None):
     # FIXME: calculate your dot color, or return None to exclude the job
     if build_log is None:
         if job['state'] == 'triggered':
@@ -88,13 +101,16 @@ def color(job, build_log=None):
     for i, regexp in enumerate(regexps):
         match = regexp.search(build_log)
         if match:
-            #print(match.group(0))
+            if links is not None:
+                links[match.group(0)][pull_uri(job=job)] += 1
             return color_map(float(i) / len(regexps))
     return no_match_color
 
 
 cache = os.path.join(os.path.expanduser('~'), '.cache', 'openshift-deck-build-logs')
 entries = []
+links = collections.defaultdict(lambda: collections.defaultdict(lambda: 0))
+
 known_urls = set()
 for root, _, files in os.walk(cache):
     if 'job.json' in files and 'build-log.txt' in files:
@@ -103,7 +119,7 @@ for root, _, files in os.walk(cache):
         with open(os.path.join(root, 'build-log.txt'), 'r') as f:
             build_log = f.read()
         known_urls.add(job['url'])
-        job_color = color(job=job, build_log=build_log)
+        job_color = color(job=job, build_log=build_log, links=links)
         if job_color is None:
             continue
         start, stop = start_stop(job=job)
@@ -124,7 +140,7 @@ with open(os.path.join(cache, 'jobs.json'), 'rb') as f:
             now = stop
         if job['url'] in known_urls:
             continue
-        job_color = color(job=job)
+        job_color = color(job=job, links=links)
         if job_color is None:
             continue
         entries.append({
@@ -133,6 +149,13 @@ with open(os.path.join(cache, 'jobs.json'), 'rb') as f:
             'color': job_color,
             'url': job['url'],
         })
+
+
+for total, match, pulls in sorted(((sum(pulls.values()), match, pulls) for (match, pulls) in links.items()), reverse=True):
+    print('{}\t{}'.format(total, match))
+    for count, link in sorted(((count, link) for link, count in pulls.items()), reverse=True):
+        print('\t{}\t{}'.format(count, link))
+
 
 entries.sort(key=lambda entry: entry['started'])
 #entries = [  # example of date filtering
