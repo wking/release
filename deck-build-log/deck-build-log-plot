@@ -1,12 +1,17 @@
 #!/usr/bin/python2
 
+from __future__ import print_function
+
 import argparse
 import base64
+import collections
 import datetime
 import io
 import json
 import os
 import re
+import subprocess
+import urllib
 import urllib2
 
 import matplotlib.cm
@@ -29,6 +34,10 @@ parser.add_argument(
 parser.add_argument(
     '-k', '--api-key', dest='api_key',
     help='Red Hat Bugzilla API key ( https://bugzilla.readthedocs.io/en/latest/using/preferences.html#api-keys ).',
+)
+parser.add_argument(
+    '-r', '--repo', dest='repo',
+    help='Path to local Git repository to overlay on the graph (PATH@REF).'
 )
 parser.add_argument(
     'regexps', metavar='REGEXP', nargs='+',
@@ -179,6 +188,35 @@ for legend_color, label in legend_entries:
 start = entries[0]['started']
 stop = entries[-1]['started']
 
+commits = []
+if args.repo:
+    if '@' in args.repo:
+        repo, ref = args.repo.split('@', 1)
+    else:
+        repo = args.repo
+        ref = 'origin/master'
+    subprocess.check_call(
+        args=['git', 'fetch', 'origin'],
+        close_fds=True,
+        cwd=repo,
+    )
+    environ = os.environ.copy()
+    environ['TZ'] = 'UTC'
+    environ['LANG'] = 'en_US.UTF-8'
+    log = subprocess.check_output(
+        args=['git', 'log', '--first-parent', '--format=%ct %H %s', '-z', '--since={}'.format(start.isoformat()), ref],
+        close_fds=True,
+        cwd=repo,
+        env=environ,
+    ).decode('utf-8')
+    for line in log.split('\0')[:-1]:
+        timestamp, commit, subject = line.split(' ', 2)
+        commits.append({
+            'timestamp': datetime.datetime.utcfromtimestamp(float(timestamp)),
+            'hash': commit,
+            'subject': subject,
+        })
+
 figure = matplotlib.pyplot.figure()
 figure.set_size_inches(20, 5)
 axes = figure.add_subplot(1, 1, 1)
@@ -203,6 +241,25 @@ scatter = axes.scatter(
     edgecolor='',
 )
 scatter.set_urls([entry['url'] for entry in entries])
+
+if commits:
+    print()
+    for commit in commits:
+        print('{} {} {}'.format(
+            commit['timestamp'].isoformat() + 'Z',
+            commit['hash'][:10],
+            commit['subject'],
+        ))
+    scatter = axes.scatter(
+        x=[c['timestamp'] for c in commits],
+        y=[max_value]*len(commits),
+        s=30,
+        c='none',
+        marker='d',
+        linewidths=3,
+        edgecolors='black',
+    )
+    scatter.set_urls(['subject:{}'.format(urllib.quote(c['subject'])) for c in commits])
 
 locator = matplotlib.dates.HourLocator(interval=4)
 axes.xaxis.set_major_locator(locator)
