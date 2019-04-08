@@ -40,6 +40,14 @@ parser.add_argument(
     help='Path to local Git repository to overlay on the graph (PATH@REF).'
 )
 parser.add_argument(
+    '-l', '--min-duration', dest='min_duration', default=0, type=int,
+    help='Minimum duration of a job in seconds.  If unset, defaults to 0s.'
+)
+parser.add_argument(
+    '-u', '--max-duration', dest='max_duration', type=int,
+    help='Maximum duraftion of a job in seconds.  If unset, defaults to unlimited.'
+)
+parser.add_argument(
     'regexps', metavar='REGEXP', nargs='+',
     help='Python regular expression for matching build logs.',
 )
@@ -123,6 +131,9 @@ for root, _, files in os.walk(cache):
         if job_color is None:
             continue
         start, stop = start_stop(job=job)
+        duration = (stop - start).total_seconds()
+        if duration < args.min_duration or (args.max_duration is not None and duration > args.max_duration):
+            continue
         entries.append({
             'started': start,
             'value': value(job=job, build_log=build_log),
@@ -140,6 +151,10 @@ with open(os.path.join(cache, 'jobs.json'), 'rb') as f:
             now = stop
         if job['url'] in known_urls:
             continue
+        if stop is not None:
+            duration = (stop - start).total_seconds()
+            if duration < args.min_duration or (args.max_duration is not None and duration > args.max_duration):
+                continue
         job_color = color(job=job, links=links)
         if job_color is None:
             continue
