@@ -1,0 +1,104 @@
+#!/usr/bin/env python3
+
+import datetime
+import http.server
+import json
+import logging
+import os
+import re
+import urllib.error
+import urllib.parse
+import urllib.request
+
+
+cache = os.path.join(os.path.expanduser('~'), '.cache', 'openshift-deck-build-logs')
+jobs = {
+    'data': None,
+    'last-pull': datetime.datetime(1900, 1, 1),
+    'poll': datetime.timedelta(minutes=5),
+}
+
+
+class Handler(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == '/':
+            with open('index.html', 'rb') as f:
+                body = f.read()
+                fs = os.fstat(f.fileno())
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.send_header('Content-Length', len(body))
+            self.send_header('Last-Modified', self.date_time_string(fs.st_mtime))
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        if self.path == '/data.js':
+            if datetime.datetime.now() - jobs['last-pull'] > jobs['poll']:
+                self._pull_jobs()
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', len(jobs['data']))
+            self.end_headers()
+            self.wfile.write(jobs['data'])
+            return
+        path_query = self.path.split('?', 1)
+        path = path_query[0]
+        if path == '/search':
+            if len(path_query) == 1:
+                self.send_error(400)
+                return
+            regexps = [re.compile(regexp) for regexp in urllib.parse.parse_qs(path_query[1]).get('q', [])]
+            return self._search(regexps=regexps)
+        self.send_error(404)
+
+    def _pull_jobs(self):
+        logging.info('pulling a fresh copy of the jobs JSON')
+        try:
+            with urllib.request.urlopen('https://prow.svc.ci.openshift.org/data.js') as f:
+                body = f.read()
+        except urllib.error.HTTPError as error:
+            logging.error(error)
+            self.send_error(500, explain=str(error))
+        else:
+            jobs['data'] = body
+            jobs['last-pull'] = datetime.datetime.now()
+
+    def _search(self, regexps):
+        # response structure:
+        # {
+        #   "job-URI": {
+        #     "regexp-pattern": [
+        #       {
+        #         "match": "string that matched",
+        #       },
+        #     ],
+        #   },
+        # }
+        matches = {}
+        for root, _, files in os.walk(cache):
+            if 'job.json' in files and 'build-log.txt' in files:
+                with open(os.path.join(root, 'job.json'), 'r') as f:
+                    job = json.load(f)
+                with open(os.path.join(root, 'build-log.txt'), 'r') as f:
+                    build_log = f.read()
+                for regexp in regexps:
+                    for match in regexp.finditer(build_log):
+                        if job['url'] not in matches:
+                            matches[job['url']] = {}
+                        if regexp.pattern not in matches[job['url']]:
+                            matches[job['url']][regexp.pattern] = []
+                        matches[job['url']][regexp.pattern].append({
+                            'match': match.group(0),
+                        })
+        body = json.dumps(matches).encode('utf-8')
+        self.send_response(200)
+        self.send_header('Content-Type', 'application/json')
+        self.send_header('Content-Length', len(body))
+        self.end_headers()
+        self.wfile.write(body)
+
+
+logging.basicConfig(level=logging.INFO)
+server_address = ('', 8000)
+httpd = http.server.HTTPServer(server_address, Handler)
+httpd.serve_forever()

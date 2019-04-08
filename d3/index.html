@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>OpenShift Bugzilla</title>
+    <meta charset="UTF-8">
+    <style type="text/css">
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+
+      svg {
+        display: block;
+        position: absolute;
+        margin: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script>
+      var markRadius = 5;
+      var markOpacity = 0.75;
+      var axisPadding = 50;
+      var yAxisPadding = 70;  // y-axis label needs a bit more space, with the y-axis tick labels sticking out further from the axis
+
+      var svg = d3.select('body').append('svg')
+        .attr('preserveAspectRatio', 'xMidYMid meet')
+        .attr('xmlns', 'http://www.w3.org/2000/svg')
+        .attr('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+
+      var timestampParse = d3.utcParse('%s');
+      var isoParse = d3.utcParse('%Y-%m-%dT%H:%M:%S%Z');
+      var isoFormat = d3.utcFormat('%Y-%m-%dT%H:%M:%SZ');
+
+      var xScale = d3.scaleUtc();
+      var yScale = d3.scaleLinear();
+
+      var xAxis = d3.axisBottom(xScale);
+      var yAxis = d3.axisLeft(yScale);
+
+      var filter = '-e2e-aws';
+
+      // {
+      //   "regexp-pattern": {
+      //     "job-URI": [
+      //       {
+      //         "match": "string that matched",
+      //       },
+      //     ],
+      //   },
+      // }
+      var regexps = new Map();
+
+      regexps.set('could not (wait for|get) build.*', new Map());
+      regexps.set('pods .* already exists|pod .* was already deleted', new Map());
+      regexps.set('waiting for Kubernetes API: context deadline exceeded', new Map());
+      regexps.set('failed to wait for bootstrap-complete.*', new Map());
+      regexps.set('failed to initialize the cluster.*', new Map());
+      regexps.set('level.*timeout while waiting for state', new Map());
+      regexps.set('Container setup exited with code ., reason Error', new Map());
+      regexps.set('failed:.*deploymentconfigs when run iteratively .* should only deploy the last deployment', new Map());
+      regexps.set('Cluster upgrade should maintain a functioning cluster', new Map());
+
+      // generic patterns so you can hover to see details in the tooltip
+      regexps.set('error.*', new Map());
+      regexps.set('failed.*', new Map());
+      regexps.set('fatal.*', new Map());
+      regexps.set('Container setup in pod .* completed successfully', new Map());
+      //regexps.set('failed:.*', new Map());
+
+      var regexpColors = [
+        '#800000',  // maroon
+        '#fabebe',  // pink
+        '#e6beff',  // lavender
+        '#000075',  // navy
+        '#4363d8',  // blue
+        '#000000',  // black
+        '#e6194B',  // red
+        '#42d4f4',  // cyan
+        '#f032e6',  // magenta
+        '#469990',  // teal
+        '#9A6324',  // brown
+        '#aaffc3',  // mint
+        '#911eb4',  // purple
+        '#808000',  // olive
+        '#ffd8b1',  // apricot
+      ];
+      var jobs = [];
+
+      function regexpMatches(job) {
+        var matches = new Map();
+        regexps.forEach((regexpMatches, regexp) => {
+          patternMatches = regexpMatches.get(job.url);
+          if (patternMatches) {
+            var matchArray = [];
+            matches.set(regexp, matchArray);
+            patternMatches.forEach(match => matchArray.push(match));
+          }
+        });
+        return matches;
+      }
+
+      function color(job) {
+        if (!job.job.includes(filter)) {
+          return;
+        }
+
+        var matches = regexpMatches(job);
+        if (matches.size > 0) {
+          var matchedColor;
+          [...regexps.keys()].some((regexp, i) => {
+            if (matches.get(regexp)) {
+              matchedColor = regexpColors[i];
+              return true;
+            }
+          });
+          if (matchedColor) {
+            return matchedColor;
+          }
+        }
+        switch (job.state) {
+        case 'aborted':
+          return;
+        case 'success':
+          return '#a9a9a9';  // gray
+        case 'failure':
+          return '#f58231';  // orange
+        case 'pending':
+          return '#ffe119';  // yellow
+        default:
+          console.log('unrecognized job state', job.state);
+        }
+      }
+
+      function legendHighlight(datum, index) {
+        this.style.setProperty('font-weight', 'bold');
+        var regexp = [...regexps.keys()][index];
+        svg.selectAll('a.job > circle[data-regexps*="' + regexp + '"]')
+          .attr('r', 2 * markRadius);
+      }
+
+      function legendLowlight(datum, index) {
+        this.style.setProperty('font-weight', 'normal');
+        var regexp = [...regexps.keys()][index];
+        svg.selectAll('a.job > circle[data-regexps*="' + regexp + '"]')
+          .attr('r', markRadius);
+      }
+
+      function redraw(interval) {
+        var height = window.innerHeight;
+        var width = window.innerWidth;
+        var data = jobs.filter(job => color(job));
+        xScale.domain(d3.extent(data, job => job.started));
+        yScale.domain([0, d3.max(data, job => job.duration)]);
+
+        svg.selectAll('*').remove();
+
+        if (data.length > 0) {
+          var now = Math.max(d3.max(data, job => job.started), d3.max(data, job => job._finished));
+          var xMax = xScale.domain()[1];
+          var yMax = yScale.domain()[1];
+          svg.append('line')
+            .attr('x1', xScale(xMax))
+            .attr('y1', yScale((now - xMax) / 60000))
+            .attr('x2', xScale(now - yMax * 60000))
+            .attr('y2', yScale(yMax))
+            .attr('stroke', 'black')
+            .attr('stroke-opacity', '0.25');
+        }
+        svg.selectAll('a.job')
+          .data(data)
+          .enter()
+          .append('a')
+            .classed('job', true)
+            .attr('xlink:href', job => job.url)
+          .append('circle')
+            .attr('cx', job => xScale(job.started))
+            .attr('cy', job => yScale(job.duration))
+            .attr('r', markRadius)
+            .attr('fill-opacity', markOpacity)
+            .attr('fill', job => color(job))
+            .attr('data-regexps', job => [...regexpMatches(job).keys()].join('||'))
+          .append('title')
+            .text(job => {
+              //return JSON.stringify(job, null, 2));
+              var matches = regexpMatches(job);
+              if (matches.size > 0) {
+                var matchStrings = [];
+                matches.forEach(matchArray => {
+                  matchArray.forEach(match => matchStrings.push(match.match));
+                });
+                return matchStrings.join('\n');
+              }
+              return job.state;
+            });
+
+        svg.append('g')
+          .attr('transform', 'translate(0, ' + (height - axisPadding) + ')')
+          .call(xAxis);
+        svg.append('g')
+          .attr('transform', 'translate(' + yAxisPadding + ', 0)')
+          .call(yAxis);
+
+        svg.append('text')
+          .attr('x', width / 2)
+          .attr('y', axisPadding / 2)
+          .style('text-anchor', 'middle')
+          .style('cursor', 'pointer')
+          .on('click', () => {
+             newFilter = window.prompt('job name filter', filter);
+             if (newFilter) {
+               filter = newFilter;
+               redraw();
+             }
+          })
+          .text(data.length + ' recent ' + filter + ' jobs')
+        var xLabel = svg.append('text')
+          .attr('x', width / 2)
+          .attr('y', height - axisPadding / 2)
+          .attr('dy', '1em')
+          .style('text-anchor', 'middle');
+        if (data.length === 0) {
+          xLabel.text('started');
+        } else if (data.length === 1) {
+          xLabel.text('started (' + isoFormat(data[0].started) + ')');
+        } else {
+          xLabel.text('started (' + isoFormat(data[0].started) + ' through ' + isoFormat(data[data.length - 1].started) + ')');
+        }
+        svg.append('text')
+          .attr('y', yAxisPadding / 3)
+          .attr('x', -height / 2)
+          .attr('transform', 'rotate(-90)')
+          .style('text-anchor', 'middle')
+          .text('duration (minutes)');
+
+        var totalFailures = data.filter(job => job.state === 'failure').length;
+        var legend = [];
+        [...regexps.keys()].forEach((regexp, i) => {
+          var matchCount = data.filter(job => regexps.get(regexp).get(job.url)).length;
+          legend.push({
+            color: regexpColors[i],
+            text: matchCount + ' (' + Math.round(matchCount / (totalFailures || 1) * 100)+ '% of all failures) ' + regexp,
+          });
+        });
+        var matchCount = data.filter(job => job.state === 'failure' && regexpMatches(job).size === 0).length;
+        legend.push({
+          color: color({job: filter, state: 'failure'}),
+          text: matchCount + ' (' + Math.round(matchCount / (totalFailures || 1) * 100) + '% of all failures) other failures',
+        });
+        ['pending', 'success'].forEach(state => {
+          matchCount = data.filter(job => job.state === state).length;
+          legend.push({
+            color: color({job: filter, state: state}),
+            text: matchCount + ' (' + Math.round(matchCount / (data.length || 1) * 100) + '% of jobs) ' + state,
+          });
+        });
+        var dy = 20;
+        var y = axisPadding;
+        var gLegend = svg.selectAll('g.legend')
+          .data(legend)
+          .enter()
+          .append('g')
+            .classed('legend', true);
+        gLegend.append('circle')
+          .attr('cx', yAxisPadding + 2 * markRadius)
+          .attr('cy', (entry, index) => axisPadding + (index + 1) * dy - markRadius)
+          .attr('r', markRadius)
+          .attr('fill-opacity', markOpacity)
+          .attr('fill', entry => entry.color);
+        gLegend.append('text')
+          .attr('x', yAxisPadding + 4 * markRadius)
+          .attr('y', (entry, index) => axisPadding + (index + 1) * dy)
+          .text(entry => entry.text)
+          .on('mouseover', legendHighlight)
+          .on('mouseout', legendLowlight);
+
+        if (interval) {
+          window.setTimeout(refetch, interval, interval);
+        }
+      }
+
+      function refetch(interval) {
+        // Currently: Reason: CORS header ‘Access-Control-Allow-Origin’ missing
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/Errors/CORSMissingAllowOrigin
+        //d3.json('https://prow.svc.ci.openshift.org/data.js', (error, data) => (
+        d3.json('data.js')
+          .then(data => {
+            var now = new Date()
+            data.forEach(job => {
+              job.started = timestampParse(job.started);
+              if (job.finished === '') {
+                job._finished = now;
+              }  else {
+                job._finished = isoParse(job.finished)
+              }
+              job.duration = (job._finished - job.started) / 60000;  // minutes
+            });
+
+            data.sort((a, b) => a.started - b.started);
+            jobs = data;
+            search(interval);
+          })
+          .catch(alert);
+      }
+
+      function resize() {
+        var height = window.innerHeight;
+        var width = window.innerWidth;
+
+        svg
+          .attr('width', width)
+          .attr('height', height);
+
+        xScale.range([yAxisPadding, width - axisPadding]);
+        yScale.range([height - axisPadding, axisPadding]);
+
+        redraw();
+      }
+
+      function search(interval) {
+        var searchParams = new URLSearchParams();
+        regexps.forEach((_, regexp) => {
+          searchParams.append('q', regexp);
+        });
+        d3.json('search?' + searchParams)
+          .then(data => {
+            [...regexps.keys()].forEach(regexp => regexps.set(regexp, new Map()));
+            for (var jobURI in data) {
+              for (var regexp in data[jobURI]) {
+                regexps.get(regexp).set(jobURI, data[jobURI][regexp]);
+              }
+            }
+            redraw(interval);
+          })
+          .catch(alert);
+      }
+
+      refetch(60000);
+      resize();
+
+      window.addEventListener('resize', resize);
+    </script>
+  </body>
+</html>
