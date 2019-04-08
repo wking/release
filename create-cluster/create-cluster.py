@@ -61,7 +61,7 @@ while True:
     try:
         response = urllib2.urlopen(url=uri)
     except urllib2.HTTPError as error:
-        if job < 6016:  # known recent job, you may want to bump this
+        if job < 6539:  # known recent job, you may want to bump this
             data['missing'].append(job)
             continue
         print(error)
