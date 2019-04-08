@@ -110,16 +110,17 @@ def color(job, build_log=None, links=None):
         match = regexp.search(build_log)
         if match:
             if links is not None:
-                links[match.group(0)][pull_uri(job=job)] += 1
+                links[match.group(0)][pull_uri(job=job)].append(job)
             return color_map(float(i) / len(regexps))
     return no_match_color
 
 
 cache = os.path.join(os.path.expanduser('~'), '.cache', 'openshift-deck-build-logs')
 entries = []
-links = collections.defaultdict(lambda: collections.defaultdict(lambda: 0))
+links = collections.defaultdict(lambda: collections.defaultdict(list))
 
 known_urls = set()
+namespace_regexp = re.compile('^.* Using namespace (.*)$')
 for root, _, files in os.walk(cache):
     if 'job.json' in files and 'build-log.txt' in files:
         with open(os.path.join(root, 'job.json'), 'rb') as f:
@@ -127,6 +128,11 @@ for root, _, files in os.walk(cache):
         with open(os.path.join(root, 'build-log.txt'), 'r') as f:
             build_log = f.read()
         known_urls.add(job['url'])
+        for line in build_log.splitlines():
+            match = namespace_regexp.match(line)
+            if match:
+                job['namespace'] = match.group(1)
+                break
         job_color = color(job=job, build_log=build_log, links=links)
         if job_color is None:
             continue
@@ -166,10 +172,28 @@ with open(os.path.join(cache, 'jobs.json'), 'rb') as f:
         })
 
 
-for total, match, pulls in sorted(((sum(pulls.values()), match, pulls) for (match, pulls) in links.items()), reverse=True):
+for total, match, pulls in sorted(
+        (
+            (
+                sum(len(jobs) for jobs in pulls.values()),
+                match,
+                pulls,
+            )
+            for (match, pulls) in links.items()
+        ), reverse=True):
     print('{}\t{}'.format(total, match))
-    for count, link in sorted(((count, link) for link, count in pulls.items()), reverse=True):
-        print('\t{}\t{}'.format(count, link))
+    for count, link, jobs in sorted(
+            (
+                (
+                    len(jobs),
+                    link,
+                    jobs,
+                )
+                for link, jobs in pulls.items()
+            ), reverse=True):
+        jobs.sort(key=lambda job: int(job['started']))
+        latest_namespace = jobs[-1]['namespace']
+        print('\t{}\t{}\t{}'.format(count, link, latest_namespace))
 
 
 entries.sort(key=lambda entry: entry['started'])
