@@ -23,6 +23,13 @@ sync() {
 		then
 			curl "${BUILD_LOG_URL}" >"${BUILD_LOG_PATH}"
 		fi &&
+		#CONTEXT="$(echo "${JOB}" | jq -r .context | sed 's|.*/||')" &&
+		#PODS_URL="${BUILD_LOG_URL/build-log.txt/}artifacts/${CONTEXT}/pods.json" &&
+		#PODS_PATH="${BUILD_LOG_PATH/build-log.txt/}pods.json" &&
+		#if test ! -f "${PODS_PATH}"
+		#then
+		#	curl "${PODS_URL}" >"${PODS_PATH}"
+		#fi &&
 		if test -z "${OLDEST_TIMESTAMP}" || test "${STARTED}" -lt "${OLDEST_TIMESTAMP}"
 		then
 			OLDEST_TIMESTAMP="${STARTED}"

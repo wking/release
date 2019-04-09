@@ -127,12 +127,18 @@ for root, _, files in os.walk(cache):
             job = json.load(f)
         with open(os.path.join(root, 'build-log.txt'), 'r') as f:
             build_log = f.read()
+        #try:
+        #    with open(os.path.join(root, 'pods.json'), 'r') as f:
+        #        pods = f.read()
+        #except Exception:
+        #    pods = ''
         known_urls.add(job['url'])
         for line in build_log.splitlines():
             match = namespace_regexp.match(line)
             if match:
                 job['namespace'] = match.group(1)
                 break
+        #job_color = color(job=job, build_log=build_log + pods, links=links)
         job_color = color(job=job, build_log=build_log, links=links)
         if job_color is None:
             continue
