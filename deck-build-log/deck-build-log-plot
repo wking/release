@@ -192,7 +192,11 @@ for total, match, pulls in sorted(
                 for link, jobs in pulls.items()
             ), reverse=True):
         jobs.sort(key=lambda job: int(job['started']))
-        latest_namespace = jobs[-1]['namespace']
+        namespaces = [job['namespace'] for job in jobs if job.get('namespace')]
+        if namespaces:
+            latest_namespace = namespaces[-1]
+        else:
+            latest_namespace = 'NO NAMESPACE'
         print('\t{}\t{}\t{}'.format(count, link, latest_namespace))
 
 
