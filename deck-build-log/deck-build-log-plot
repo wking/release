@@ -178,6 +178,7 @@ with open(os.path.join(cache, 'jobs.json'), 'rb') as f:
         })
 
 
+pull_lines = []
 for total, match, pulls in sorted(
         (
             (
@@ -187,7 +188,7 @@ for total, match, pulls in sorted(
             )
             for (match, pulls) in links.items()
         ), reverse=True):
-    print('{}\t{}'.format(total, match))
+    pull_lines.append('{}\t{}'.format(total, match))
     for count, link, jobs in sorted(
             (
                 (
@@ -203,7 +204,9 @@ for total, match, pulls in sorted(
             latest_namespace = namespaces[-1]
         else:
             latest_namespace = 'NO NAMESPACE'
-        print('\t{}\t{}\t{}'.format(count, link, latest_namespace))
+        pull_lines.append('\t{}\t{}\t{}'.format(count, link, latest_namespace))
+for line in pull_lines:
+    print(line)
 
 
 entries.sort(key=lambda entry: entry['started'])
@@ -354,6 +357,8 @@ if args.bug is not None:
     url = bugzilla_template.format(args.bug) + '?api_key={}'.format(args.api_key)
     buf = io.BytesIO()
     figure.savefig(buf, format='svg')
+    if len(pull_lines) > 10:
+        pull_lines = pull_lines[:10] + ['...']
     data = {
         'ids': [args.bug],
         'data': base64.b64encode(buf.getvalue()),
@@ -366,6 +371,7 @@ if args.bug is not None:
         'comment': '''This occurred in {matches} of our {total} failures ({percent}%) in *-e2e-aws* jobs across the whole CI system over the past {hours} hours.  Generated with [1]:
 
   $ deck-build-log-plot {regexp!r}
+  {lines}
 
 [1]: https://github.com/wking/openshift-release/tree/debug-scripts/deck-build-log
 '''.format(
@@ -374,6 +380,7 @@ if args.bug is not None:
             percent=match_failures[0] * 100 // failures,
             hours=int((stop - start).total_seconds()) // 3600,
             regexp=regexps[0].pattern,
+            lines='\n  '.join(pull_lines),
         ),
     }
     try:
