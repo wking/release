@@ -149,6 +149,28 @@
           .attr('r', markRadius);
       }
 
+      function legendClick(datum, index) {
+        var oldRegexp = [...regexps.keys()][index];
+        var newRegexp = window.prompt('build-log regexp', oldRegexp);
+        if (newRegexp === oldRegexp) {
+          return;
+        } else if (newRegexp === '') {
+          regexps.delete(oldRegexp);
+          return;
+        }
+        var entries = [];
+        regexps.forEach((value, key) => {
+          if (key === oldRegexp) {
+            key = newRegexp;
+            value = new Map();
+          }
+          entries.push([key, value]);
+        });
+        oldMap = regexps;
+        regexps = new Map(entries);
+        search();
+      }
+
       function redraw(interval) {
         var height = window.innerHeight;
         var width = window.innerWidth;
@@ -210,7 +232,7 @@
           .style('text-anchor', 'middle')
           .style('cursor', 'pointer')
           .on('click', () => {
-             newFilter = window.prompt('job name filter', filter);
+             var newFilter = window.prompt('job name filter', filter);
              if (newFilter) {
                filter = newFilter;
                redraw();
@@ -275,7 +297,8 @@
           .attr('y', (entry, index) => axisPadding + (index + 1) * dy)
           .text(entry => entry.text)
           .on('mouseover', legendHighlight)
-          .on('mouseout', legendLowlight);
+          .on('mouseout', legendLowlight)
+          .on('click', legendClick);
 
         if (interval) {
           window.setTimeout(refetch, interval, interval);
