@@ -47,8 +47,17 @@ class Handler(http.server.BaseHTTPRequestHandler):
             if len(path_query) == 1:
                 self.send_error(400)
                 return
-            regexps = [re.compile(regexp) for regexp in urllib.parse.parse_qs(path_query[1]).get('q', [])]
-            return self._search(regexps=regexps)
+            query = urllib.parse.parse_qs(path_query[1])
+            names = query.get('name', [])
+            if len(names) == 0:
+                name = None
+            elif len(names) == 1:
+                name = re.compile(names[0])
+            else:
+                self.send_error(400)
+                return
+            regexps = [re.compile(regexp) for regexp in query.get('q', [])]
+            return self._search(regexps=regexps, name=name)
         self.send_error(404)
 
     def _pull_jobs(self):
@@ -63,7 +72,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             jobs['data'] = body
             jobs['last-pull'] = datetime.datetime.now()
 
-    def _search(self, regexps):
+    def _search(self, regexps, name=None):
         # response structure:
         # {
         #   "job-URI": {
@@ -79,6 +88,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
             if 'job.json' in files and 'build-log.txt' in files:
                 with open(os.path.join(root, 'job.json'), 'r') as f:
                     job = json.load(f)
+                if name is not None and not name.search(job['job']):
+                    continue
                 with open(os.path.join(root, 'build-log.txt'), 'r') as f:
                     build_log = f.read()
                 for regexp in regexps:

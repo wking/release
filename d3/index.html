@@ -104,7 +104,7 @@
       }
 
       function color(job) {
-        if (!job.job.includes(filter)) {
+        if (job.job && !job.job.match(filter)) {
           return;
         }
 
@@ -269,13 +269,13 @@
         });
         var matchCount = data.filter(job => job.state === 'failure' && regexpMatches(job).size === 0).length;
         legend.push({
-          color: color({job: filter, state: 'failure'}),
+          color: color({state: 'failure'}),
           text: matchCount + ' (' + Math.round(matchCount / (totalFailures || 1) * 100) + '% of all failures) other failures',
         });
         ['pending', 'success'].forEach(state => {
           matchCount = data.filter(job => job.state === state).length;
           legend.push({
-            color: color({job: filter, state: state}),
+            color: color({state: state}),
             text: matchCount + ' (' + Math.round(matchCount / (data.length || 1) * 100) + '% of jobs) ' + state,
           });
         });
@@ -345,6 +345,7 @@
 
       function search(interval) {
         var searchParams = new URLSearchParams();
+        searchParams.append('name', filter);
         regexps.forEach((_, regexp) => {
           searchParams.append('q', regexp);
         });
