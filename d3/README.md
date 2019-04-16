@@ -17,7 +17,7 @@ We will continue to refresh every minute while you have the page open.
 ![](deck.png)
 
 Click the chart title to edit the job-name filter string (`-e2e-aws` by default).
-Currently you have to edit [`index.html`](index.html) to adjust the build-log regular expressions.
+Currently you have to edit [`index.html`](index.html) to add additional build-log regular expressions, but you can click on the legend text to edit a regular expression (or set it to the empty string to remove that legend entry entirely).
 
 Hover over data points to get a tooltip with all of the error lines matching any regular expression (although point-color is from the earliest matching regular expression).
 Hover over the regular expression in the legend to double the size of the matching data points (regardless of whether that match is the earliest matching regular expression).
