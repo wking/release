@@ -60,3 +60,9 @@ Test started between 2019-04-04T05:55:29 and 2019-04-04T05:55:29 UTC
 57/118  48      .*release-.*-origin-.*-e2e-aws.*
 6/6     100     .*release-.*-ocp-.*-e2e-aws.*
 ```
+
+
+# Building the container
+```
+$ podman build -t deck-build-log .
+```
