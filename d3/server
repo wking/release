@@ -92,6 +92,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     continue
                 with open(os.path.join(root, 'build-log.txt'), 'r') as f:
                     build_log = f.read()
+                for aux in ['clusteroperators.json', 'events.json', 'nodes.json', 'pods.json']:
+                    try:
+                        with open(os.path.join(root, aux), 'r') as f:
+                            build_log += f.read()
+                    except Exception:
+                        pass
                 for regexp in regexps:
                     for match in regexp.finditer(build_log):
                         if job['url'] not in matches:
