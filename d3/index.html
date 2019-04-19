@@ -138,14 +138,20 @@
       function legendHighlight(datum, index) {
         this.style.setProperty('font-weight', 'bold');
         var regexp = [...regexps.keys()][index];
-        svg.selectAll('a.job > circle[data-regexps*="' + regexp + '"]')
+        if (regexp === undefined) {
+          return;
+        }
+        svg.selectAll('a.job > circle[data-regexps*="' + regexp.replace(/"/g, '\\"') + '"]')
           .attr('r', 2 * markRadius);
       }
 
       function legendLowlight(datum, index) {
         this.style.setProperty('font-weight', 'normal');
         var regexp = [...regexps.keys()][index];
-        svg.selectAll('a.job > circle[data-regexps*="' + regexp + '"]')
+        if (regexp === undefined) {
+          return;
+        }
+        svg.selectAll('a.job > circle[data-regexps*="' + regexp.replace(/"/g, '\\"') + '"]')
           .attr('r', markRadius);
       }
 
