@@ -8,10 +8,10 @@ sync() {
 	while read JOB
 	do
 		BUILD="$(echo "${JOB}" | jq -r .build_id)" &&
-		JOB_URL="$(echo "${JOB}" | jq -r .url)" &&
+		JOB_URI="$(echo "${JOB}" | jq -r .url)" &&
 		STARTED="$(echo "${JOB}" | jq -r .started)" &&
-		BUILD_LOG_URL="${JOB_URL/openshift-gce-devel.appspot.com\/build/storage.googleapis.com}/build-log.txt" &&
-		BUILD_LOG_PATH="${BUILD_LOG_CACHE}${BUILD_LOG_URL#*origin-ci-test}" &&
+		BUILD_LOG_URI="${JOB_URI/openshift-gce-devel.appspot.com\/build/storage.googleapis.com}/build-log.txt" &&
+		BUILD_LOG_PATH="${BUILD_LOG_CACHE}${BUILD_LOG_URI#*origin-ci-test}" &&
 		JOB_PATH="$(dirname "${BUILD_LOG_PATH}")" &&
 		JSON_PATH="${JOB_PATH}/job.json" &&
 		mkdir -p "${JOB_PATH}" &&
@@ -21,15 +21,24 @@ sync() {
 		fi &&
 		if test ! -f "${BUILD_LOG_PATH}"
 		then
-			curl "${BUILD_LOG_URL}" >"${BUILD_LOG_PATH}"
+			curl "${BUILD_LOG_URI}" >"${BUILD_LOG_PATH}"
 		fi &&
-		#CONTEXT="$(echo "${JOB}" | jq -r .context | sed 's|.*/||')" &&
-		#PODS_URL="${BUILD_LOG_URL/build-log.txt/}artifacts/${CONTEXT}/pods.json" &&
-		#PODS_PATH="${BUILD_LOG_PATH/build-log.txt/}pods.json" &&
-		#if test ! -f "${PODS_PATH}"
-		#then
-		#	curl "${PODS_URL}" >"${PODS_PATH}"
-		#fi &&
+
+		CONTEXT="$(echo "${JOB}" | jq -r .context | sed 's|.*/||')" &&
+		if test -n "${CONTEXT}"
+		then
+			for DETAIL in #clusteroperators.json events.json nodes.json pods.json
+			do
+				DETAIL_URI="${BUILD_LOG_URI/build-log.txt/}artifacts/${CONTEXT}/${DETAIL}" &&
+				DETAIL_PATH="${BUILD_LOG_PATH/build-log.txt/}${DETAIL}" &&
+				if test ! -f "${PODS_PATH}"
+				then
+					 echo "${DETAIL_PATH}" >&2
+					 curl "${DETAIL_URI}" >"${DETAIL_PATH}"
+				fi
+			done
+		fi
+
 		if test -z "${OLDEST_TIMESTAMP}" || test "${STARTED}" -lt "${OLDEST_TIMESTAMP}"
 		then
 			OLDEST_TIMESTAMP="${STARTED}"
