@@ -51,4 +51,7 @@ for root, _, files in os.walk(cache):
 print('Failed\t% of {}\tTest (started between {} and {} UTC)'.format(
     total, first.isoformat(), last.isoformat()))
 for failures, test in sorted([(failures, test) for test, failures in entries.items()], reverse=True):
-    print('{}\t{}\t{}'.format(failures, failures * 100 // total, test))
+    try:
+        print('{}\t{}\t{}'.format(failures, failures * 100 // total, test))
+    except BrokenPipeError:
+        break
