@@ -286,7 +286,8 @@
           });
         });
         var dy = 20;
-        var y = axisPadding;
+        var y = axisPadding;  // high
+        //var y = height - axisPadding - dy * (legend.length + 1);  // low
         var gLegend = svg.selectAll('g.legend')
           .data(legend)
           .enter()
