@@ -10,6 +10,7 @@ import sys
 
 humans = set([
     'acrawfor',
+    'ccoleman',
     'jolamb',
     'jrussell',
     'dmace',
