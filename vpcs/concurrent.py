@@ -27,11 +27,14 @@ response = urllib2.urlopen('https://prow.svc.ci.openshift.org/data.js')
 jobs = json.load(response)
 response.close()
 
+begin = datetime.datetime.now() - datetime.timedelta(hours=24)  # sometimes old jobs get stuck in Prow, and if we don't filter them they stretch out the early graph
 clusters = []
 for job in jobs:
     if '-e2e-aws' not in job['job']:
         continue
     start, stop = start_stop(job)
+    if stop is not None and stop < begin:
+        continue
     clusters.append((start, stop))
 clusters.sort(key=lambda start_stop: start_stop[0])
 
