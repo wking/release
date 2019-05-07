@@ -3,6 +3,19 @@
 import datetime
 import json
 import re
+try:
+    import statistics
+except ImportError:  # Python 2
+    class statistics(object):
+        @staticmethod
+        def mean(data):
+            return sum(data) / float(len(data))
+
+        @staticmethod
+        def median(median):
+            values = sorted(median)
+            index = len(values) // 2
+            return values[index]
 import urllib2
 
 import matplotlib.dates
@@ -45,24 +58,25 @@ known_jobs = set()
 try:
     with open('create-cluster.json') as f:
         data = json.load(f, cls=DateTimeDecoder)
-        known_jobs.update([job for _, _, job in data['success']])
-        known_jobs.update([job for _, job in data['failure']])
-        known_jobs.update(data['missing'])
+        known_jobs.update([(name, job) for _, _, name, job in data['success']])
+        known_jobs.update([(name, job) for _, name, job in data['failure']])
+        known_jobs.update([(name, job) for name, job in data['missing']])
 except IOError:
     pass
 
-job = 630  # earlier runs have a different log format
+name = 'release-openshift-origin-installer-e2e-aws-4.1'
+job = 0  # earlier runs have a different log format
 while True:
     job += 1
-    if job in known_jobs:
+    if (name, job) in known_jobs:
         continue
     print(job)
-    uri = 'https://storage.googleapis.com/origin-ci-test/logs/release-openshift-origin-installer-e2e-aws-4.0/{}/build-log.txt'.format(job)
+    uri = 'https://storage.googleapis.com/origin-ci-test/logs/{}/{}/build-log.txt'.format(name, job)
     try:
         response = urllib2.urlopen(url=uri)
     except urllib2.HTTPError as error:
-        if job < 6539:  # known recent job, you may want to bump this
-            data['missing'].append(job)
+        if job < 671:  # known recent job, you may want to bump this
+            data['missing'].append((name, job))
             continue
         print(error)
         break
@@ -78,11 +92,11 @@ while True:
             break
     response.close()
     if complete is not None:
-        data['success'].append([start, complete, job])
+        data['success'].append([start, complete, name, job])
     elif start is not None:
-        data['failure'].append([start, job])
+        data['failure'].append([start, name, job])
     else:
-        data['missing'].append(job)
+        data['missing'].append([name, job])
 
 for data_list in data.values():
     data_list.sort()
@@ -100,10 +114,13 @@ axes.set_xlabel('start time')
 xs = []
 ys = []
 urls = []
-for start, complete, job in data['success']:
+for start, complete, name, job in data['success']:
     xs.append(start)
     ys.append((complete - start).total_seconds() / 60.)
-    urls.append('https://prow.k8s.io/view/gcs/origin-ci-test/logs/release-openshift-origin-installer-e2e-aws-4.0/{}'.format(job))
+    urls.append('https://prow.k8s.io/view/gcs/origin-ci-test/logs/{}/{}'.format(name, job))
+print('mean of last 50: {:.2f}'.format(statistics.mean(ys[-50:])))
+print('median of last 50: {:.2f}'.format(statistics.median(ys[-50:])))
+
 scatter = axes.scatter(x=xs, y=ys, marker='.', edgecolor='')
 scatter.set_urls(urls)
 
