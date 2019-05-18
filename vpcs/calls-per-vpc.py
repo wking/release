@@ -86,15 +86,17 @@ vpc_counts = float(len(requests['CreateVpc']))
 
 xs = []
 ys = []
+new_names = []
 for name in names:
     print('{}\t{:.2f}\t{}'.format(len(requests[name]), len(requests[name]) / vpc_counts, name))
     if name == 'CreateVpc':
         continue
     xs.append(bin_centers)
     ys.append([count / float(vpc_count) for count, vpc_count in zip(counts[name], counts['CreateVpc'])])
+    new_names.append(name)
 
 axes = figure.add_subplot(2, 1, 2)
-for x, y, name in zip(xs, ys, names):
+for x, y, name in zip(xs, ys, new_names):
     axes.plot(x, y, label=name)
 axes.set_xlabel('{} through {} UTC'.format(begin.isoformat(' '), end.isoformat(' ')))
 axes.set_ylabel('count (per {}-minute bin, per VPC)'.format(bin_minutes))
