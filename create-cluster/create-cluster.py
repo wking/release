@@ -64,7 +64,7 @@ try:
 except IOError:
     pass
 
-name = 'release-openshift-origin-installer-e2e-aws-4.1'
+name = 'release-openshift-origin-installer-e2e-aws-4.2'
 job = 0  # earlier runs have a different log format
 while True:
     job += 1
@@ -75,7 +75,7 @@ while True:
     try:
         response = urllib2.urlopen(url=uri)
     except urllib2.HTTPError as error:
-        if job < 841:  # known recent job, you may want to bump this
+        if job < 422:  # known recent job, you may want to bump this
             data['missing'].append((name, job))
             continue
         print(error)
