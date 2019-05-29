@@ -10063,6 +10063,62 @@
       }, 
       "release-openshift-origin-installer-e2e-aws-4.1", 
       670
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T15:03:44"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      701
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T20:41:55"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      716
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T04:25:27"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      730
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T18:02:15"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      779
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T18:26:45"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      780
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T21:11:01"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      781
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-15T19:54:40"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      808
     ]
   ], 
   "missing": [
@@ -10273,6 +10329,22 @@
     [
       "release-openshift-origin-installer-e2e-aws-4.1", 
       467
+    ], 
+    [
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      793
+    ], 
+    [
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      794
+    ], 
+    [
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      795
+    ], 
+    [
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      796
     ]
   ], 
   "success": [
@@ -73563,6 +73635,1866 @@
       }, 
       "release-openshift-origin-installer-e2e-aws-4.1", 
       675
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-07T23:02:35"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-07T23:27:40"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      676
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-07T23:26:46"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-07T23:54:43"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      677
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-07T23:38:26"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T00:07:49"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      678
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-07T23:39:21"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T00:17:39"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      679
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-07T23:59:06"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T00:26:50"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      680
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T00:02:16"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T00:30:24"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      681
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T00:14:56"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T00:47:46"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      682
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T00:22:24"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T00:55:13"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      683
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T01:01:43"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T01:27:58"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      684
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T01:30:25"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T02:03:13"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      685
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T02:01:14"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T02:29:40"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      686
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T02:38:34"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T03:10:52"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      687
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T03:01:49"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T03:29:41"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      688
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T03:19:43"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T03:48:05"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      689
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T03:50:08"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T04:16:01"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      690
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T04:23:38"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T04:55:11"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      691
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T04:49:02"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T05:16:13"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      692
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T06:05:24"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T06:31:43"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      693
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T07:08:01"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T07:37:26"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      694
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T07:30:20"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T08:00:27"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      695
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T09:59:42"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T10:27:35"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      696
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T10:50:43"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T11:19:08"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      697
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T11:21:59"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T11:50:15"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      698
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T13:21:09"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T13:49:05"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      699
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T13:28:42"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T13:54:16"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      700
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T15:16:08"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T15:44:23"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      702
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T15:40:47"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T16:11:15"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      703
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T16:18:13"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T16:48:42"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      704
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T16:46:21"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T17:13:52"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      705
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T16:50:58"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T17:22:55"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      706
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T17:22:42"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T17:48:28"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      707
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T17:31:40"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T17:58:27"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      708
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T18:03:45"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T18:33:21"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      709
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T18:08:04"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T18:46:07"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      710
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T18:20:03"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T18:47:04"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      711
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T18:20:41"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T18:53:25"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      712
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T18:53:12"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T19:25:06"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      713
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T18:58:36"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T19:26:40"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      714
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T19:51:43"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T20:22:10"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      715
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T20:45:59"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T21:36:50"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      717
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T20:48:05"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T21:34:43"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      718
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T21:05:03"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T21:43:16"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      719
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T21:06:10"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T21:41:06"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      720
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T21:28:24"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T21:53:58"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      721
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T22:05:40"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T22:32:31"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      722
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T22:32:04"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T23:02:20"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      723
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T22:55:36"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T23:23:37"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      724
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T22:58:08"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-08T23:25:08"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      725
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T00:15:26"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T00:48:38"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      726
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T00:36:24"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T01:07:52"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      727
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T01:11:38"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T01:38:31"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      728
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T01:20:11"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T01:46:20"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      729
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T04:46:10"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T05:16:16"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      731
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T07:33:19"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T08:03:59"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      732
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T08:16:21"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T08:45:15"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      733
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T08:37:06"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T09:16:51"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      734
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T10:05:51"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T10:34:33"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      735
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T10:15:33"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T10:43:21"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      736
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T11:33:55"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T12:04:54"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      737
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T11:59:23"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T12:26:56"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      738
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T12:59:14"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T13:26:08"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      739
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T14:41:39"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T15:15:37"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      740
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T14:57:27"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T15:24:24"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      741
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T15:16:13"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T15:43:35"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      742
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T15:35:47"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T16:04:53"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      743
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T16:04:26"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T16:38:14"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      744
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T16:27:50"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T17:01:47"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      745
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T16:42:14"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T17:10:45"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      746
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T16:44:27"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T17:09:32"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      747
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T16:51:54"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T17:18:03"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      748
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T17:21:48"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T18:00:30"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      749
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T18:25:27"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T19:01:05"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      750
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T19:00:09"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T19:30:50"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      751
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T19:16:25"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T19:41:43"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      752
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T19:26:52"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T20:05:09"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      753
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T19:35:26"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T20:03:07"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      754
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T20:12:25"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T20:50:06"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      755
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T20:36:35"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T21:07:00"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      756
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T21:33:24"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T22:00:01"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      757
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T21:34:28"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T22:01:11"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      758
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T21:38:15"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T22:04:51"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      759
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T21:39:38"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T22:08:50"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      760
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T21:40:06"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T22:14:27"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      761
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T22:07:48"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T22:36:31"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      762
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T22:42:14"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T23:09:49"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      763
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-09T23:56:47"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T00:34:50"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      764
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T01:31:22"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T02:03:55"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      765
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T01:47:37"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T02:18:39"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      766
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T04:23:59"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T04:52:52"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      767
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T07:34:07"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T08:02:51"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      768
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T08:21:05"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T08:47:19"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      769
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T08:43:44"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T09:12:17"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      770
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T10:46:34"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T11:13:44"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      771
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T10:57:35"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T11:30:08"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      772
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T12:45:37"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T13:12:12"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      773
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T14:14:45"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T14:40:04"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      774
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T15:00:35"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T15:28:58"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      775
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T15:41:36"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T16:16:28"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      776
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T15:51:56"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T16:21:00"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      777
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T17:30:52"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-10T17:57:54"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      778
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-11T17:53:59"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-11T18:25:18"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      782
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-12T15:01:31"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-12T15:28:13"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      783
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-12T18:23:34"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-12T18:50:36"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      784
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-12T19:33:24"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-12T20:00:39"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      785
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T07:06:25"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T07:33:32"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      786
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T12:17:34"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T12:44:07"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      787
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T14:20:08"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T14:52:48"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      788
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T14:53:37"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T15:19:58"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      789
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T15:16:19"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T15:43:53"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      790
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T17:21:18"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T17:54:58"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      791
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T19:10:33"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T19:43:51"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      792
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T21:16:37"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T21:45:02"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      797
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T22:29:14"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-13T23:03:19"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      798
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-14T04:23:33"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-14T04:50:33"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      799
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-14T17:12:39"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-14T17:39:09"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      800
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-14T18:41:34"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-14T19:07:40"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      801
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-14T20:34:44"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-14T21:02:09"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      802
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-14T23:32:20"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-15T00:08:02"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      803
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-15T12:01:20"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-15T12:27:51"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      804
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-15T16:01:25"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-15T16:39:20"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      805
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-15T16:12:43"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-15T16:40:18"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      806
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-15T17:48:57"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-15T18:22:33"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      807
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T07:15:27"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T07:48:48"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      809
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T11:18:53"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T11:52:07"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      810
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T11:28:49"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T11:56:41"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      811
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T14:12:36"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T14:39:59"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      812
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T16:37:09"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T17:05:01"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      813
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T16:55:15"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T17:27:55"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      814
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T19:46:17"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T20:16:11"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      815
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T19:50:15"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T20:24:05"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      816
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T20:49:24"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T21:22:38"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      817
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T21:37:00"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T22:06:34"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      818
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T22:43:09"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-16T23:17:32"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      819
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-17T01:28:41"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-17T01:58:02"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      820
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-17T08:50:34"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-17T09:18:11"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      821
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-17T11:43:55"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-17T12:14:11"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      822
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-17T15:42:58"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-17T16:13:24"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      823
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-17T16:21:58"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-17T16:52:20"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      824
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-17T18:30:27"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-17T19:02:07"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      825
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-17T19:57:02"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-17T20:23:38"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      826
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-17T20:18:00"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-17T20:43:06"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      827
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-18T01:08:11"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-18T01:36:26"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      828
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-18T01:51:23"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-18T02:23:08"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      829
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-20T22:40:23"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-20T23:12:36"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      830
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-20T22:41:02"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-20T23:20:07"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      831
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-21T00:59:29"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-21T01:28:45"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      832
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-22T00:58:54"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-22T01:27:08"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      833
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-22T14:55:35"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-22T15:31:30"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      834
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-22T19:16:16"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-22T19:51:54"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      835
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-23T14:11:34"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-23T14:57:39"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      836
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-23T16:53:37"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-23T17:29:04"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      837
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-24T17:51:15"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-24T18:19:10"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      838
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-28T15:03:47"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-28T15:35:35"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      839
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-28T16:53:58"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-28T17:21:57"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      840
+    ], 
+    [
+      {
+        "_type": "datetime", 
+        "value": "2019-05-29T13:21:07"
+      }, 
+      {
+        "_type": "datetime", 
+        "value": "2019-05-29T13:52:04"
+      }, 
+      "release-openshift-origin-installer-e2e-aws-4.1", 
+      841
     ]
   ]
 }
