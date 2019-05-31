@@ -30,7 +30,7 @@ response.close()
 begin = datetime.datetime.now() - datetime.timedelta(hours=24)  # sometimes old jobs get stuck in Prow, and if we don't filter them they stretch out the early graph
 clusters = []
 for job in jobs:
-    if '-e2e-aws' not in job['job']:
+    if 'aws' not in job['job']:
         continue
     start, stop = start_stop(job)
     if stop is not None and stop < begin:
@@ -57,7 +57,7 @@ figure.set_size_inches(20, 5)
 
 axes = figure.add_subplot(1, 1, 1)
 axes.plot(times, concurrent, '.')
-axes.set_title('Concurrent clusters ({} total)'.format(len(clusters)))
+axes.set_title('Concurrent AWS clusters ({} total)'.format(len(clusters)))
 axes.set_ylabel('count')
 axes.set_xlabel('{} through {} UTC'.format(start.isoformat(' '), stop.isoformat(' ')))
 locator = matplotlib.dates.AutoDateLocator()
