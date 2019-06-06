@@ -26,7 +26,10 @@ import matplotlib.dates
 import matplotlib.pyplot
 
 
-error_suffix = ' (error)'
+#error_suffix = ' (error)'
+error_suffix = None
+yscale = 'log'
+errors = set()
 reader = csv.DictReader(sys.stdin)
 requests = collections.defaultdict(list)
 creates = deletes = 0
@@ -40,18 +43,22 @@ for row in reader:
     end = timestamp
     event = row['eventname']
     if row['errorcode']:
-        event += error_suffix
+        if error_suffix:
+            event += error_suffix
+        else:
+            event += ' ({})'.format(row['errorcode'])
+        errors.add(event)
     requests[event].append(timestamp)
 
 data = []
 names = []
 for event, times in sorted(requests.items()):
-    if not event.endswith(error_suffix):
+    if event in errors:
         continue
     data.append(matplotlib.dates.date2num(times))
     names.append(event)
 for event, times in sorted(requests.items()):
-    if event.endswith(error_suffix):
+    if event not in errors:
         continue
     data.append(matplotlib.dates.date2num(times))
     names.append(event)
@@ -63,6 +70,8 @@ figure = matplotlib.pyplot.figure()
 figure.set_size_inches(20, 10)
 
 axes = figure.add_subplot(2, 1, 1)
+if yscale:
+    axes.set_yscale(yscale)
 _, bins, _ = axes.hist(data, bins, histtype='barstacked', rwidth=1, edgecolor='none', label=names)
 axes.set_title('Calls')
 axes.set_xlabel('{} through {} UTC'.format(begin.isoformat(' '), end.isoformat(' ')))
@@ -96,6 +105,8 @@ for name in names:
     new_names.append(name)
 
 axes = figure.add_subplot(2, 1, 2)
+if yscale:
+    axes.set_yscale(yscale)
 for x, y, name in zip(xs, ys, new_names):
     axes.plot(x, y, label=name)
 axes.set_xlabel('{} through {} UTC'.format(begin.isoformat(' '), end.isoformat(' ')))
