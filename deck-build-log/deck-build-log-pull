@@ -10,7 +10,7 @@ sync() {
 		BUILD="$(echo "${JOB}" | jq -r .build_id)" &&
 		JOB_URI="$(echo "${JOB}" | jq -r .url)" &&
 		STARTED="$(echo "${JOB}" | jq -r .started)" &&
-		BUILD_LOG_URI="${JOB_URI/openshift-gce-devel.appspot.com\/build/storage.googleapis.com}/build-log.txt" &&
+		BUILD_LOG_URI="${JOB_URI/prow.svc.ci.openshift.org\/view\/gcs/storage.googleapis.com}/build-log.txt" &&
 		BUILD_LOG_PATH="${BUILD_LOG_CACHE}${BUILD_LOG_URI#*origin-ci-test}" &&
 		JOB_PATH="$(dirname "${BUILD_LOG_PATH}")" &&
 		JSON_PATH="${JOB_PATH}/job.json" &&
