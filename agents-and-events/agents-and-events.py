@@ -51,6 +51,8 @@ for row in reader:
         operator = 'aws-ec2'
     elif 'elasticloadbalancing.amazonaws.com' in row['useragent']:
         operator = 'aws-elasticloadbalancing'
+    elif 'kubernetes/' in row['useragent']:
+        operator = 'kubernetes'
     elif 'OpenShift/4.x Installer' in row['useragent']:
         operator = 'installer'
     elif 'OpenShift/4.x Destroyer' in row['useragent']:
