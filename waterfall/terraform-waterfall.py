@@ -3,6 +3,7 @@
 #   $ curl -s https://storage.googleapis.com/origin-ci-test/logs/release-openshift-origin-installer-e2e-aws-4.0/6016/artifacts/e2e-aws/installer/.openshift_install.log | terraform-waterfall.py >terraform.svg
 
 import datetime
+import logging
 import re
 import sys
 
@@ -11,6 +12,7 @@ log_regexp = re.compile('^time="([0-9T:-]*)[Z+-](?:[0-9:]*)?" level=([a-z]*) msg
 creating_regexp = re.compile('^([^:]*): Creating\.\.\.$')
 created_regexp = re.compile('^([^:]*): Creation complete after .*$')
 
+max_time = None
 resources = {}
 reference_time = None
 for line in sys.stdin.readlines():
@@ -19,6 +21,7 @@ for line in sys.stdin.readlines():
         continue
     time, _, message = match.groups()
     timestamp = datetime.datetime.strptime(time, '%Y-%m-%dT%H:%M:%S')  # fromisoformat is new in Python 3.7
+    max_time = timestamp
 
     match = creating_regexp.match(message)
     if match:
@@ -35,6 +38,11 @@ for line in sys.stdin.readlines():
 
 if not resources:
     raise ValueError('no resources completed?')
+
+for resource in list(resources.keys()):
+    if len(resources[resource]) == 1:
+        logging.warning('never completed {}'.format(resource))
+        resources[resource].append(max_time)
 
 rectangles = []
 y = 0
