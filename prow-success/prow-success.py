@@ -46,14 +46,16 @@ if args.since:
 
 excluded = set()
 if args.exclude_build_log:
-    params = urllib.parse.urlencode({
+    params = {
         'name': '.',
         'maxAge': '24h',
         'context': '0',
         'type': 'build-log',
         'search': args.exclude_build_log,
-    })
-    uri = 'https://search.svc.ci.openshift.org/search?{}'.format(params)
+    }
+    if args.include_job:
+        params['name'] = args.include_job
+    uri = 'https://search.svc.ci.openshift.org/search?{}'.format(urllib.parse.urlencode(params))
     with urllib.request.urlopen(uri) as response:
         data = response.read()
     excluded = json.loads(data.decode('utf-8'))
