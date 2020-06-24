@@ -1,0 +1,14 @@
+ref:
+  as: gather-proxy
+  from_image:
+    namespace: ocp
+    name: cli-jq
+    tag: latest
+  commands: gather-proxy-commands.sh
+  resources:
+    requests:
+      cpu: 300m
+      memory: 300Mi
+  documentation: |-
+    The pre-deprovision artifacts step collects logs of all containers captured by loki. Even of containers created but no longer presented in the cluster.
+  
