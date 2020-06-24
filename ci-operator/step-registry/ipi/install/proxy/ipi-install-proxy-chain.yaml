@@ -1,7 +1,0 @@
-chain:
-    as: ipi-install-proxy
-    steps:
-    - ref: ipi-install-proxy
-    - ref: ipi-install
-    documentation: |-
-      The IPI install step chain contains all the individual steps necessary to install an OpenShift cluster behind an AWS proxy.

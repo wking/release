@@ -4,292 +4,353 @@ set -o nounset
 set -o errexit
 set -o pipefail
 
-function generate_proxy_certs() {
-
-  ROOTCA=${SHARED_DIR}
-  INTERMEDIATE=${ROOTCA}/INTERMEDIATE
-
-  mkdir ${ROOTCA}
-  pushd ${ROOTCA}
-  mkdir certs crl newcerts private
-  chmod 700 private
-  touch index.txt
-  echo 1000 > serial
-
-  cat > ${ROOTCA}/openssl.cnf << EOF
-[ ca ]
-default_ca = CA_default
-[ CA_default ]
-# Directory and file locations.
-dir               = ${ROOTCA}
-certs             = \$dir/certs
-crl_dir           = \$dir/crl
-new_certs_dir     = \$dir/newcerts
-database          = \$dir/index.txt
-serial            = \$dir/serial
-RANDFILE          = \$dir/private/.rand
-# The root key and root certificate.
-private_key       = \$dir/private/ca.key.pem
-certificate       = \$dir/certs/ca.cert.pem
-# For certificate revocation lists.
-crlnumber         = \$dir/crlnumber
-crl               = \$dir/crl/ca.crl.pem
-crl_extensions    = crl_ext
-copy_extensions   = copy
-default_crl_days  = 30
-# SHA-1 is deprecated, so use SHA-2 instead.
-default_md        = sha256
-name_opt          = ca_default
-cert_opt          = ca_default
-default_days      = 375
-preserve          = no
-policy            = policy_loose
-[ policy_strict ]
-# The root CA should only sign intermediate certificates that match.
-countryName             = match
-stateOrProvinceName     = match
-organizationName        = match
-organizationalUnitName  = optional
-commonName              = supplied
-emailAddress            = optional
-[ policy_loose ]
-# Allow the intermediate CA to sign a more diverse range of certificates.
-countryName             = optional
-stateOrProvinceName     = optional
-localityName            = optional
-organizationName        = optional
-organizationalUnitName  = optional
-commonName              = supplied
-emailAddress            = optional
-[ req ]
-default_bits        = 2048
-distinguished_name  = ca_dn
-string_mask         = utf8only
-# SHA-1 is deprecated, so use SHA-2 instead.
-default_md          = sha256
-# Extension to add when the -x509 option is used.
-x509_extensions     = v3_ca
-prompt              = no
-[ ca_dn ]
-0.domainComponent       = "io"
-1.domainComponent       = "openshift"
-organizationName        = "OpenShift Origin"
-organizationalUnitName  = "Proxy CI Signing CA"
-commonName              = "Proxy CI Signing CA"
-[ v3_ca ]
-subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid:always,issuer
-basicConstraints = critical, CA:true
-keyUsage = critical, digitalSignature, cRLSign, keyCertSign
-[ v3_intermediate_ca ]
-subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid:always,issuer
-basicConstraints = critical, CA:true, pathlen:0
-keyUsage = critical, digitalSignature, cRLSign, keyCertSign
-[ usr_cert ]
-basicConstraints = CA:FALSE
-nsCertType = client, email
-nsComment = "OpenSSL Generated Client Certificate"
-subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid,issuer
-keyUsage = critical, nonRepudiation, digitalSignature, keyEncipherment
-extendedKeyUsage = clientAuth, emailProtection
-[ server_cert ]
-basicConstraints = CA:FALSE
-nsCertType = server
-nsComment = "OpenSSL Generated Server Certificate"
-subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid,issuer:always
-keyUsage = critical, digitalSignature, keyEncipherment
-extendedKeyUsage = serverAuth
-[ crl_ext ]
-authorityKeyIdentifier=keyid:always
-[ ocsp ]
-basicConstraints = CA:FALSE
-subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid,issuer
-keyUsage = critical, digitalSignature
-extendedKeyUsage = critical, OCSPSigning
+function generate_proxy_ignition() {
+cat > /tmp/proxy.ign << EOF
+{
+  "ignition": {
+    "config": {},
+    "security": {
+      "tls": {}
+    },
+    "timeouts": {},
+    "version": "2.2.0"
+  },
+  "passwd": {
+    "users": [
+      {
+        "name": "core",
+        "sshAuthorizedKeys": [
+          "${ssh_pub_key}"
+        ]
+      }
+    ]
+  },
+  "storage": {
+    "files": [
+      {
+        "filesystem": "root",
+        "path": "/tmp/squid/passwords",
+        "user": {
+          "name": "root"
+        },
+        "contents": {
+          "source": "data:text/plain;base64,${HTPASSWD_CONTENTS}"
+        },
+        "mode": 420
+      },
+      {
+        "filesystem": "root",
+        "path": "/tmp/squid/squid.conf",
+        "user": {
+          "name": "root"
+        },
+        "contents": {
+          "source": "data:text/plain;base64,${SQUID_CONFIG}"
+        },
+        "mode": 420
+      },
+      {
+        "filesystem": "root",
+        "path": "/tmp/squid.sh",
+        "user": {
+          "name": "root"
+        },
+        "contents": {
+          "source": "data:text/plain;base64,${SQUID_SH}"
+        },
+        "mode": 420
+      },
+      {
+        "filesystem": "root",
+        "path": "/tmp/squid/proxy.sh",
+        "user": {
+          "name": "root"
+        },
+        "contents": {
+          "source": "data:text/plain;base64,${PROXY_SH}"
+        },
+        "mode": 420
+      }
+    ]
+  },
+  "systemd": {
+    "units": [
+      {
+        "contents": "[Service]\n\nExecStart=bash /tmp/squid.sh\n\n[Install]\nWantedBy=multi-user.target\n",
+        "enabled": true,
+        "name": "squid.service"
+      },
+      {
+        "dropins": [
+          {
+            "contents": "[Service]\nExecStart=\nExecStart=/usr/lib/systemd/systemd-journal-gatewayd \\\n  --key=/opt/openshift/tls/journal-gatewayd.key \\\n  --cert=/opt/openshift/tls/journal-gatewayd.crt \\\n  --trust=/opt/openshift/tls/root-ca.crt\n",
+            "name": "certs.conf"
+          }
+        ],
+        "name": "systemd-journal-gatewayd.service"
+      },
+      {
+        "enabled": true,
+        "name": "systemd-journal-gatewayd.socket"
+      }
+    ]
+  }
+}
 EOF
 
-  # create root key
-  uuidgen | sha256sum | cut -b -32 > capassfile
-
-  openssl genrsa -aes256 -out private/ca.key.pem -passout file:capassfile 4096 2>/dev/null
-  chmod 400 private/ca.key.pem
-
-  # create root certificate
-
-  openssl req -config openssl.cnf \
-    -key private/ca.key.pem \
-    -passin file:capassfile \
-    -new -x509 -days 7300 -sha256 -extensions v3_ca \
-    -out certs/ca.cert.pem 2>/dev/null
-
-  chmod 444 certs/ca.cert.pem
-
-  mkdir ${INTERMEDIATE}
-  pushd ${INTERMEDIATE}
-
-  mkdir certs crl csr newcerts private
-  chmod 700 private
-  touch index.txt
-  echo 1000 > serial
-
-  echo 1000 > ${INTERMEDIATE}/crlnumber
-
-  cat > ${INTERMEDIATE}/openssl.cnf << EOF
-[ ca ]
-default_ca = CA_default
-[ CA_default ]
-# Directory and file locations.
-dir               = ${INTERMEDIATE}
-certs             = \$dir/certs
-crl_dir           = \$dir/crl
-new_certs_dir     = \$dir/newcerts
-database          = \$dir/index.txt
-serial            = \$dir/serial
-RANDFILE          = \$dir/private/.rand
-# The root key and root certificate.
-private_key       = \$dir/private/intermediate.key.pem
-certificate       = \$dir/certs/intermediate.cert.pem
-# For certificate revocation lists.
-crlnumber         = \$dir/crlnumber
-crl               = \$dir/crl/intermediate.crl.pem
-crl_extensions    = crl_ext
-default_crl_days  = 30
-# SHA-1 is deprecated, so use SHA-2 instead.
-default_md        = sha256
-name_opt          = ca_default
-cert_opt          = ca_default
-default_days      = 375
-preserve          = no
-policy            = policy_loose
-[ policy_strict ]
-# The root CA should only sign intermediate certificates that match.
-countryName             = match
-stateOrProvinceName     = match
-organizationName        = match
-organizationalUnitName  = optional
-commonName              = supplied
-emailAddress            = optional
-[ policy_loose ]
-# Allow the intermediate CA to sign a more diverse range of certificates.
-countryName             = optional
-stateOrProvinceName     = optional
-localityName            = optional
-organizationName        = optional
-organizationalUnitName  = optional
-commonName              = supplied
-emailAddress            = optional
-[ req ]
-default_bits        = 2048
-distinguished_name  = req_distinguished_name
-prompt              = no
-string_mask         = utf8only
-# SHA-1 is deprecated, so use SHA-2 instead.
-default_md          = sha256
-# Extension to add when the -x509 option is used.
-x509_extensions     = v3_ca
-req_extensions      = req_ext
-[ req_distinguished_name ]
-0.domainComponent       = "io"
-1.domainComponent       = "openshift"
-organizationName        = "OpenShift Origin"
-organizationalUnitName  = "CI Proxy"
-commonName              = "CI Proxy"
-[ req_ext ]
-subjectAltName          = "DNS.1:*.compute-1.amazonaws.com"
-[ v3_ca ]
-subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid:always,issuer
-basicConstraints = critical, CA:true
-keyUsage = critical, digitalSignature, cRLSign, keyCertSign
-[ v3_intermediate_ca ]
-subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid:always,issuer
-basicConstraints = critical, CA:true, pathlen:0
-keyUsage = critical, digitalSignature, cRLSign, keyCertSign
-[ usr_cert ]
-basicConstraints = CA:FALSE
-nsCertType = client, email
-nsComment = "OpenSSL Generated Client Certificate"
-subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid,issuer
-keyUsage = critical, nonRepudiation, digitalSignature, keyEncipherment
-extendedKeyUsage = clientAuth, emailProtection
-[ server_cert ]
-basicConstraints = CA:FALSE
-nsCertType = server
-nsComment = "OpenSSL Generated Server Certificate"
-subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid,issuer:always
-keyUsage = critical, digitalSignature, keyEncipherment
-extendedKeyUsage = serverAuth
-[ crl_ext ]
-authorityKeyIdentifier=keyid:always
-[ ocsp ]
-basicConstraints = CA:FALSE
-subjectKeyIdentifier = hash
-authorityKeyIdentifier = keyid,issuer
-keyUsage = critical, digitalSignature
-extendedKeyUsage = critical, OCSPSigning
-EOF
-
-  popd
-  uuidgen | sha256sum | cut -b -32 > intpassfile
-
-  openssl genrsa -aes256 \
-    -out ${INTERMEDIATE}/private/intermediate.key.pem \
-    -passout file:intpassfile 4096 2>/dev/null
-
-  chmod 400 ${INTERMEDIATE}/private/intermediate.key.pem
-
-  openssl req -config ${INTERMEDIATE}/openssl.cnf -new -sha256 \
-    -key ${INTERMEDIATE}/private/intermediate.key.pem \
-    -passin file:intpassfile \
-    -out ${INTERMEDIATE}/csr/intermediate.csr.pem 2>/dev/null
-
-  openssl ca -config openssl.cnf -extensions v3_intermediate_ca \
-    -days 3650 -notext -md sha256 \
-    -batch \
-    -in ${INTERMEDIATE}/csr/intermediate.csr.pem \
-    -passin file:capassfile \
-    -out ${INTERMEDIATE}/certs/intermediate.cert.pem 2>/dev/null
-
-  chmod 444 ${INTERMEDIATE}/certs/intermediate.cert.pem
-
-  openssl verify -CAfile certs/ca.cert.pem \
-    ${INTERMEDIATE}/certs/intermediate.cert.pem
-
-  cat ${INTERMEDIATE}/certs/intermediate.cert.pem \
-    certs/ca.cert.pem > ${INTERMEDIATE}/certs/ca-chain.cert.pem
-
-  chmod 444 ${INTERMEDIATE}/certs/ca-chain.cert.pem
-  popd
+aws s3 cp /tmp/proxy.ign ${PROXY_URI}
 }
 
+function generate_proxy_template() {
+cat > /tmp/04_cluster_proxy.yaml << EOF
+AWSTemplateFormatVersion: 2010-09-09
+Description: Template for OpenShift Cluster Proxy (EC2 Instance, Security Groups and IAM)
+
+Parameters:
+  InfrastructureName:
+    AllowedPattern: ^([a-zA-Z][a-zA-Z0-9\-]{0,26})$
+    MaxLength: 27
+    MinLength: 1
+    ConstraintDescription: Infrastructure name must be alphanumeric, start with a letter, and have a maximum of 27 characters.
+    Description: A short, unique cluster ID used to tag cloud resources and identify items owned or used by the cluster.
+    Type: String
+  RhcosAmi:
+    Description: Current Red Hat Enterprise Linux CoreOS AMI to use for proxy.
+    Type: AWS::EC2::Image::Id
+  AllowedProxyCidr:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|1[0-9]|2[0-9]|3[0-2]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/0-32.
+    Default: 0.0.0.0/0
+    Description: CIDR block to allow access to the proxy node.
+    Type: String
+  ClusterName:
+    Description: The cluster name used to uniquely identify the proxy load balancer
+    Type: String
+  PublicSubnet:
+    Description: The public subnet to launch the proxy node into.
+    Type: AWS::EC2::Subnet::Id
+  VpcId:
+    Description: The VPC-scoped resources will belong to this VPC.
+    Type: AWS::EC2::VPC::Id
+  ProxyIgnitionLocation:
+    Default: s3://my-s3-bucket/proxy.ign
+    Description: Ignition config file location.
+    Type: String
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: "Cluster Information"
+      Parameters:
+      - InfrastructureName
+    - Label:
+        default: "Host Information"
+      Parameters:
+      - RhcosAmi
+      - ProxyIgnitionLocation
+    - Label:
+        default: "Network Configuration"
+      Parameters:
+      - VpcId
+      - AllowedProxyCidr
+      - PublicSubnet
+      - ClusterName
+
+    ParameterLabels:
+      InfrastructureName:
+        default: "Infrastructure Name"
+      VpcId:
+        default: "VPC ID"
+      AllowedProxyCidr:
+        default: "Allowed ingress Source"
+      RhcosAmi:
+        default: "Red Hat Enterprise Linux CoreOS AMI ID"
+      ProxyIgnitionLocation:
+        default: "Bootstrap Ignition Source"
+      ClusterName:
+        default: "Cluster name"
+
+Resources:
+  ProxyIamRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: "Allow"
+          Principal:
+            Service:
+            - "ec2.amazonaws.com"
+          Action:
+          - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+      - PolicyName: !Join ["-", [!Ref InfrastructureName, "proxy", "policy"]]
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+          - Effect: "Allow"
+            Action: "ec2:Describe*"
+            Resource: "*"
+
+  ProxyInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Properties:
+      Path: "/"
+      Roles:
+      - Ref: "ProxyIamRole"
+
+  ProxySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Cluster Proxy Security Group
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        ToPort: 3128
+        FromPort: 3128
+        CidrIp: !Ref AllowedProxyCidr
+      - IpProtocol: tcp
+        ToPort: 19531
+        FromPort: 19531
+        CidrIp: !Ref AllowedProxyCidr
+      VpcId: !Ref VpcId
+
+  ProxyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref RhcosAmi
+      IamInstanceProfile: !Ref ProxyInstanceProfile
+      InstanceType: "i3.large"
+      NetworkInterfaces:
+      - AssociatePublicIpAddress: "true"
+        DeviceIndex: "0"
+        GroupSet:
+        - !Ref "ProxySecurityGroup"
+        SubnetId: !Ref "PublicSubnet"
+      UserData:
+        Fn::Base64: !Sub
+        - '{"ignition":{"config":{"replace":{"source":"\${IgnitionLocation}","verification":{}}},"timeouts":{},"version":"2.1.0"},"networkd":{},"passwd":{},"storage":{},"systemd":{}}'
+        - {
+          IgnitionLocation: !Ref ProxyIgnitionLocation
+        }
+
+Outputs:
+  ProxyPublicIp:
+    Description: The proxy node public IP address.
+    Value: !GetAtt ProxyInstance.PublicIp
+EOF
+}
+
+# TODO: move to image
+curl -L https://github.com/mikefarah/yq/releases/download/3.3.0/yq_linux_amd64 -o /tmp/yq && chmod +x /tmp/yq
+
+EXPIRATION_DATE=$(date -d '4 hours' --iso=minutes --utc)
+TAGS="Key=expirationDate,Value=${EXPIRATION_DATE}"
+
+CONFIG="${SHARED_DIR}/install-config.yaml"
+aws_subnet="$(/tmp/yq r ${CONFIG} 'platform.aws.subnets[0]')"
+
+region="$(/tmp/yq r ${CONFIG} 'platform.aws.region')"
+
+CLUSTER_NAME=${NAMESPACE}-${JOB_NAME_HASH}
+ssh_pub_key=$(<"${CLUSTER_PROFILE_DIR}/ssh-publickey")
+# get the VPC ID from the subnet -> subnet.VpcId
+# describe the subnet to get vpcID -> https://docs.aws.amazon.com/goto/WebAPI/ec2-2016-11-15/DescribeSubnets
+describe="$(aws ec2 describe-subnets --subnet-ids ${aws_subnet})"
+
+vpc_id="$(echo ${describe} | jq -r .[][0].VpcId)"
+subnets="$(aws ec2 describe-subnets --filters Name=vpc-id,Values=${vpc_id})"
+
+hosted_zones="$(aws route53 list-hosted-zones-by-vpc --vpc-id ${vpc_id} --vpc-region ${region})"
+echo hosted zones: ${hosted_zones}
+
+
+HTPASSWD_CONTENTS="${CLUSTER_NAME}:"$(openssl passwd -apr1 ${PASSWORD})""
+HTPASSWD_CONTENTS="$(echo -e ${HTPASSWD_CONTENTS} | base64 -w0)"
+
+# define squid config
+SQUID_CONFIG="$(base64 -w0 << EOF
+http_port 3128
+cache deny all
+access_log stdio:/tmp/squid-access.log all
+debug_options ALL,1
+shutdown_lifetime 0
+auth_param basic program /usr/lib64/squid/basic_ncsa_auth /squid/passwords
+auth_param basic realm proxy
+acl authenticated proxy_auth REQUIRED
+http_access allow authenticated
+pid_filename /tmp/proxy-setup
+EOF
+)"
+
+# define squid.sh
+SQUID_SH="$(base64 -w0 << EOF
+#!/bin/bash
+podman run --entrypoint='["bash", "/squid/proxy.sh"]' --expose=3128 --net host --volume /tmp/squid:/squid:Z ${PROXY_IMAGE}
+EOF
+)"
+
+# define proxy.sh
+PROXY_SH="$(base64 -w0 << EOF
+#!/bin/bash
+function print_logs() {
+    while [[ ! -f /tmp/squid-access.log ]]; do
+    sleep 5
+    done
+    tail -f /tmp/squid-access.log
+}
+print_logs &
+squid -N -f /squid/squid.conf
+EOF
+)"
 
 cluster_name=${NAMESPACE}-${JOB_NAME_HASH}
 
 CONFIG="${SHARED_DIR}/install-config.yaml"
-CERTS="${SHARED_DIR}/INTERMEDIATE/certs"
 
 PASSWORD="$(uuidgen | sha256sum | cut -b -32)"
 
-cat >> "${CERTS}/password" << EOF
-${PASSWORD}
-EOF
+# create ignition entries for certs and script to start squid and systemd unit entry
+# create the proxy stack and then get its IP
+PROXY_URI="s3://${CLUSTER_NAME}/proxy.ign"
 
-PROXY_DNS="squid.${cluster_name}.origin-ci-int-aws.dev.rhcloud.com"
+generate_proxy_ignition
+generate_proxy_template
 
-PROXY_URL="http://${cluster_name}:${PASSWORD}@${PROXY_DNS}:3128/"
-TLS_PROXY_URL="https://${cluster_name}:${PASSWORD}@${PROXY_DNS}:3130/"
+aws cloudformation create-stack \
+  --stack-name "${CLUSTER_NAME}-proxy" \
+  --template-body "$(cat "/tmp/04_cluster_proxy.yaml")" \
+  --tags "${TAGS}" \
+  --capabilities CAPABILITY_NAMED_IAM \
+  --parameters \
+  ParameterKey=ClusterName,ParameterValue="${CLUSTER_NAME}" \
+  ParameterKey=VpcId,ParameterValue="${vpc_id}" \
+  ParameterKey=ProxyIgnitionLocation,ParameterValue="${PROXY_URI}" \
+  ParameterKey=InfrastructureName,ParameterValue="${CLUSTER_NAME}" \
+  ParameterKey=RhcosAmi,ParameterValue="${RHCOS_AMI}" \
+  ParameterKey=PublicSubnet,ParameterValue="${PUBLIC_SUBNETS%%,*}\"" &
+
+wait "$!"
+
+aws cloudformation wait stack-create-complete --stack-name "${CLUSTER_NAME}-proxy" &
+wait "$!"
+
+# cleaning up after ourselves
+aws s3 rm ${PROXY_URI}
+
+PROXY_IP="$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-proxy" \
+  --query 'Stacks[].Outputs[?OutputKey == `ProxyPublicIp`].OutputValue' --output text)"
+
+PROXY_URL="http://${cluster_name}:${PASSWORD}@${PROXY_IP}:3128/"
+# due to https://bugzilla.redhat.com/show_bug.cgi?id=1750650 we don't use a tls end point for squid
 
 cat >> "${CONFIG}" << EOF
 proxy:
   httpsProxy: ${PROXY_URL}
   httpProxy: ${PROXY_URL}
-additionalTrustBundle: |
-$(cat ${CERTS}/ca-chain.cert.pem | awk '{print "  "$0}')
 EOF
