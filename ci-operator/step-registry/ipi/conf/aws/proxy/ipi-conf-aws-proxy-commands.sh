@@ -97,8 +97,6 @@ cat > /tmp/proxy.ign << EOF
   }
 }
 EOF
-
-aws s3 cp /tmp/proxy.ign ${PROXY_URI}
 }
 
 function generate_proxy_template() {
@@ -253,23 +251,28 @@ EXPIRATION_DATE=$(date -d '4 hours' --iso=minutes --utc)
 TAGS="Key=expirationDate,Value=${EXPIRATION_DATE}"
 
 CONFIG="${SHARED_DIR}/install-config.yaml"
-aws_subnet="$(/tmp/yq r ${CONFIG} 'platform.aws.subnets[0]')"
-
-region="$(/tmp/yq r ${CONFIG} 'platform.aws.region')"
 
 CLUSTER_NAME=${NAMESPACE}-${JOB_NAME_HASH}
 ssh_pub_key=$(<"${CLUSTER_PROFILE_DIR}/ssh-publickey")
-# get the VPC ID from the subnet -> subnet.VpcId
-# describe the subnet to get vpcID -> https://docs.aws.amazon.com/goto/WebAPI/ec2-2016-11-15/DescribeSubnets
-describe="$(aws ec2 describe-subnets --subnet-ids ${aws_subnet})"
 
-vpc_id="$(echo ${describe} | jq -r .[][0].VpcId)"
-subnets="$(aws ec2 describe-subnets --filters Name=vpc-id,Values=${vpc_id})"
+# get the VPC ID from a subnet -> subnet.VpcId
+aws_subnet="$(/tmp/yq r ${CONFIG} 'platform.aws.subnets[0]')"
+vpc_id="$(aws ec2 describe-subnets --subnet-ids ${aws_subnet} | jq -r .[][0].VpcId)"
 
-hosted_zones="$(aws route53 list-hosted-zones-by-vpc --vpc-id ${vpc_id} --vpc-region ${region})"
-echo hosted zones: ${hosted_zones}
+# for each subnet:
+# aws ec2 describe-route-tables --filters Name=association.subnet-id,Values=${value} | grep '"GatewayId": "igw.*'
+  # if $? then use it as the public subnet
 
+public_subnet=""
+for subnet in "$(/tmp/yq r -P ${CONFIG} 'platform.aws.subnets') | sed 's/- //g'"; do
+  aws ec2 describe-route-tables --filters Name=association.subnet-id,Values=${subnet} | grep '"GatewayId": "igw.*' 1>&2 > /dev/null
+  if [ $? ]; then
+    public_subnet="$(echo ${subnet})"
+    break
+  fi
+done
 
+PASSWORD="$(uuidgen | sha256sum | cut -b -32)"
 HTPASSWD_CONTENTS="${CLUSTER_NAME}:"$(openssl passwd -apr1 ${PASSWORD})""
 HTPASSWD_CONTENTS="$(echo -e ${HTPASSWD_CONTENTS} | base64 -w0)"
 
@@ -309,11 +312,6 @@ squid -N -f /squid/squid.conf
 EOF
 )"
 
-cluster_name=${NAMESPACE}-${JOB_NAME_HASH}
-
-CONFIG="${SHARED_DIR}/install-config.yaml"
-
-PASSWORD="$(uuidgen | sha256sum | cut -b -32)"
 
 # create ignition entries for certs and script to start squid and systemd unit entry
 # create the proxy stack and then get its IP
@@ -321,6 +319,9 @@ PROXY_URI="s3://${CLUSTER_NAME}/proxy.ign"
 
 generate_proxy_ignition
 generate_proxy_template
+
+# push the generated ignition to the s3 bucket
+aws s3 cp /tmp/proxy.ign ${PROXY_URI}
 
 aws cloudformation create-stack \
   --stack-name "${CLUSTER_NAME}-proxy" \
@@ -333,7 +334,7 @@ aws cloudformation create-stack \
   ParameterKey=ProxyIgnitionLocation,ParameterValue="${PROXY_URI}" \
   ParameterKey=InfrastructureName,ParameterValue="${CLUSTER_NAME}" \
   ParameterKey=RhcosAmi,ParameterValue="${RHCOS_AMI}" \
-  ParameterKey=PublicSubnet,ParameterValue="${PUBLIC_SUBNETS%%,*}\"" &
+  ParameterKey=PublicSubnet,ParameterValue="${public_subnet}" &
 
 wait "$!"
 
@@ -346,7 +347,7 @@ aws s3 rm ${PROXY_URI}
 PROXY_IP="$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-proxy" \
   --query 'Stacks[].Outputs[?OutputKey == `ProxyPublicIp`].OutputValue' --output text)"
 
-PROXY_URL="http://${cluster_name}:${PASSWORD}@${PROXY_IP}:3128/"
+PROXY_URL="http://${CLUSTER_NAME}:${PASSWORD}@${PROXY_IP}:3128/"
 # due to https://bugzilla.redhat.com/show_bug.cgi?id=1750650 we don't use a tls end point for squid
 
 cat >> "${CONFIG}" << EOF
