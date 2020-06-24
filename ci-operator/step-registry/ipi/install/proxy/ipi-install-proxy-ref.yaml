@@ -1,0 +1,11 @@
+ref:
+    as: ipi-install-proxy
+    from: installer
+    commands: ipi-install-proxy-commands.sh
+    resources:
+      requests:
+        cpu: 10m
+        memory: 100Mi
+    documentation: |-
+      The IPI install proxy step deploys an egress proxy which fronts an installed cluster.
+  
