@@ -4,6 +4,8 @@ set -o nounset
 set -o errexit
 set -o pipefail
 
+trap 'CHILDREN=$(jobs -p); if test -n "${CHILDREN}"; then kill ${CHILDREN} && wait; fi' TERM
+
 function generate_proxy_ignition() {
 cat > /tmp/proxy.ign << EOF
 {
@@ -252,7 +254,8 @@ TAGS="Key=expirationDate,Value=${EXPIRATION_DATE}"
 
 CONFIG="${SHARED_DIR}/install-config.yaml"
 
-CLUSTER_NAME=${NAMESPACE}-${JOB_NAME_HASH}
+CLUSTER_NAME="$(/tmp/yq -r ${CONFIG} 'metadata.name')"
+
 ssh_pub_key=$(<"${CLUSTER_PROFILE_DIR}/ssh-publickey")
 
 # get the VPC ID from a subnet -> subnet.VpcId
@@ -264,16 +267,16 @@ vpc_id="$(aws ec2 describe-subnets --subnet-ids ${aws_subnet} | jq -r .[][0].Vpc
   # if $? then use it as the public subnet
 
 public_subnet=""
-for subnet in "$(/tmp/yq r -P ${CONFIG} 'platform.aws.subnets') | sed 's/- //g'"; do
-  aws ec2 describe-route-tables --filters Name=association.subnet-id,Values=${subnet} | grep '"GatewayId": "igw.*' 1>&2 > /dev/null
+for subnet in $(/tmp/yq r -P ${CONFIG} 'platform.aws.subnets' | sed 's/- //g'); do
+  aws ec2 describe-route-tables --filters Name=association.subnet-id,Values="${subnet}" | grep '"GatewayId": "igw.*' 1>&2 > /dev/null
   if [ $? ]; then
-    public_subnet="$(echo ${subnet})"
+    public_subnet="${subnet}"
     break
   fi
 done
 
 PASSWORD="$(uuidgen | sha256sum | cut -b -32)"
-HTPASSWD_CONTENTS="${CLUSTER_NAME}:"$(openssl passwd -apr1 ${PASSWORD})""
+HTPASSWD_CONTENTS="${CLUSTER_NAME}:$(openssl passwd -apr1 ${PASSWORD})"
 HTPASSWD_CONTENTS="$(echo -e ${HTPASSWD_CONTENTS} | base64 -w0)"
 
 # define squid config
