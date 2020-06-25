@@ -243,6 +243,9 @@ Outputs:
   ProxyPublicIp:
     Description: The proxy node public IP address.
     Value: !GetAtt ProxyInstance.PublicIp
+  ProxyId:
+    Description: The proxy node instanceId.
+    Value: !Ref ProxyInstance
 EOF
 }
 
@@ -350,6 +353,9 @@ aws s3 rm ${PROXY_URI}
 PROXY_IP="$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-proxy" \
   --query 'Stacks[].Outputs[?OutputKey == `ProxyPublicIp`].OutputValue' --output text)"
 
+INSTANCE_ID="$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-proxy" \
+--query 'Stacks[].Outputs[?OutputKey == `ProxyId`].OutputValue' --output text)"
+
 PROXY_URL="http://${CLUSTER_NAME}:${PASSWORD}@${PROXY_IP}:3128/"
 # due to https://bugzilla.redhat.com/show_bug.cgi?id=1750650 we don't use a tls end point for squid
 
@@ -358,3 +364,10 @@ proxy:
   httpsProxy: ${PROXY_URL}
   httpProxy: ${PROXY_URL}
 EOF
+
+# to allow log collection during gather:
+# append to proxy instance ID to "${SHARED_DIR}/aws-instance-ids.txt"
+echo ${INSTANCE_ID} >> ${SHARED_DIR}/aws-instance-ids.txt
+
+# echo proxy IP to ${SHARED_DIR}/proxyip
+echo ${PROXY_IP} >> ${SHARED_DIR}/proxyip

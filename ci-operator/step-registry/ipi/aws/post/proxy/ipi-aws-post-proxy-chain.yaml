@@ -1,5 +1,5 @@
 chain:
-    as: ipi-aws-post
+    as: ipi-aws-post-proxy
     steps:
     - ref: gather-aws-console
     - ref: gather-proxy
